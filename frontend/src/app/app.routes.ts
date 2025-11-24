@@ -1,14 +1,10 @@
 import { Routes } from '@angular/router';
+import { Home } from './home/home';
 
-import { HomeComponent } from './home/home.component';import { LoginComponent } from './user/login/login.component';
-
-const routes: Routes = [
+export const routes: Routes = [
     {
         path: 'home',
-        component: HomeComponent,
-    },{
-        path: 'login',
-        component: LoginComponent,
+        component: Home,
     },
     {
         path: '',
@@ -16,5 +12,3 @@ const routes: Routes = [
         pathMatch: 'full'
     }
 ];
-
-export { routes };

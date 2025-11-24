@@ -7,14 +7,13 @@
 
         <button class="navbar-toggler" type="button"
             aria-controls="navigation-links"
-            [attr.aria-expanded]="burgerActive"
+            [attr.aria-expanded]="!navCollapse"
             aria-label="toggle navigation"
-            (click)="toggleBurger()"
-           -aria-label>
+            (click)="navCollapse != navCollapse">
             <span class="navbar-toggler-icon"></span>
         </button>
 
-        <div id="navigation-links" class="navbar-collapse" [ngbCollapse]="!burgerActive">
+        <div id="navigation-links" class="navbar-collapse" [ngbCollapse]="navCollapse">
             <ul class="navbar-nav">
                 <li class="nav-item">
                     <a [routerLink]="['/home']" routerLinkActive="active" class="nav-link">

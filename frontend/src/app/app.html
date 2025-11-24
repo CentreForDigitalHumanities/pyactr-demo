@@ -1,10 +1,9 @@
 <div class="app">
-    <pa-menu role="banner" />
-
+    <header app-navbar></header>
     <main class="main-content mt-5 mb-5">
         <div class="container">
-            <router-outlet></router-outlet>
+            <router-outlet />
         </div>
     </main>
-    <pa-footer role="contentinfo" />
+    <footer app-footer></footer>
 </div>
