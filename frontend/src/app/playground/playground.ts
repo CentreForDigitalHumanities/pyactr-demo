@@ -57,6 +57,8 @@ export class Playground implements OnInit {
 
     onSubmit() {
         if (this.form.value.code) {
+            this.output$.next('');
+            this.error$.next('');
             this.pyodide$?.subscribe(pyodide => {
                 pyodide.setStdout({
                     batched: this.handleStdout.bind(this),
