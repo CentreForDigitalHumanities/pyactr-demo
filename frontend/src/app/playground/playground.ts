@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { loadPyodide, PyodideAPI, version as pyodideVersion } from 'pyodide';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, from, Observable } from 'rxjs';
 
 const startingCode = `import pyactr as actr
 
@@ -29,15 +29,15 @@ export class Playground implements OnInit {
         code: new FormControl<string>(startingCode, { nonNullable: true }),
     });
 
-    pyodide?: Promise<PyodideAPI>;
+    pyodide$?: Observable<PyodideAPI>;
 
     output$ = new BehaviorSubject<string>('');
     error$ = new BehaviorSubject<string>('');
 
     ngOnInit() {
-        this.pyodide = loadPyodide({
+        this.pyodide$ = from(loadPyodide({
             indexURL: `https://cdn.jsdelivr.net/pyodide/v${pyodideVersion}/full/`,
-        }).then(this.installPyactr);
+        }).then(this.installPyactr));
     }
 
     async installPyactr(pyodide: PyodideAPI): Promise<PyodideAPI> {
@@ -57,7 +57,7 @@ export class Playground implements OnInit {
 
     onSubmit() {
         if (this.form.value.code) {
-            this.pyodide?.then(pyodide => {
+            this.pyodide$?.subscribe(pyodide => {
                 pyodide.setStdout({
                     batched: this.handleStdout.bind(this),
                 });
