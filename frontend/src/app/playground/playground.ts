@@ -2,12 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { loadPyodide, PyodideAPI, version as pyodideVersion } from 'pyodide';
 
 @Component({
-    selector: 'app-demo',
+    selector: 'app-playground',
     imports: [],
-    templateUrl: './demo.html',
-    styleUrl: './demo.scss',
+    templateUrl: './playground.html',
+    styleUrl: './playground.scss',
 })
-export class Demo implements OnInit {
+export class Playground implements OnInit {
     ngOnInit() {
         loadPyodide({
             indexURL: `https://cdn.jsdelivr.net/pyodide/v${pyodideVersion}/full/`,
