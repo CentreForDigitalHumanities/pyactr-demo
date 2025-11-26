@@ -8,13 +8,14 @@
     <div class="row">
         <div class="col-lg">
             <h2>Model</h2>
-            <form>
+            <form [formGroup]="form" (submit)="onSubmit()">
                 <div class="my-3">
                     <label class="form-label" for="input-code">Simulation code</label>
-                    <textarea class="form-control" rows="24"></textarea>
+                    <textarea class="form-control font-monospace" rows="24"
+                        [formControl]="form.controls.code"></textarea>
                 </div>
                 <div class="my-3">
-                    <button class="btn btn-success">Run</button>
+                    <button class="btn btn-success" type="submit">Run</button>
                 </div>
             </form>
         </div>
