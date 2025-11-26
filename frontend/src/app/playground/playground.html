@@ -6,7 +6,7 @@
 
 <div class="container-fluid px-4 py-5">
     <div class="row">
-        <div class="col-lg">
+        <div class="col-lg-6">
             <h2>Model</h2>
             <form [formGroup]="form" (submit)="onSubmit()">
                 <div class="my-3">
@@ -19,8 +19,20 @@
                 </div>
             </form>
         </div>
-        <div class="col-lg">
+        <div class="col-lg-6">
             <h2>Output</h2>
+
+            @if (output$ | async) {
+                <div class="bg-light p-3 my-4 rounded">
+                    <pre>{{output$ | async}}</pre>
+                </div>
+            }
+
+            @if (error$ | async) {
+                <div class="bg-danger-subtle my-4 p-3 rounded">
+                    <pre>{{error$ | async}}</pre>
+                </div>
+            }
         </div>
     </div>
 </div>

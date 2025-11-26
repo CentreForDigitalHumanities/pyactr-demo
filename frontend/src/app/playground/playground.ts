@@ -1,6 +1,8 @@
+import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { loadPyodide, PyodideAPI, version as pyodideVersion } from 'pyodide';
+import { BehaviorSubject } from 'rxjs';
 
 const startingCode = `import pyactr as actr
 
@@ -16,6 +18,7 @@ print(goal)
 @Component({
     selector: 'app-playground',
     imports: [
+        CommonModule,
         ReactiveFormsModule,
     ],
     templateUrl: './playground.html',
@@ -27,6 +30,9 @@ export class Playground implements OnInit {
     });
 
     pyodide?: Promise<PyodideAPI>;
+
+    output$ = new BehaviorSubject<string>('');
+    error$ = new BehaviorSubject<string>('');
 
     ngOnInit() {
         this.pyodide = loadPyodide({
@@ -41,9 +47,23 @@ export class Playground implements OnInit {
         return pyodide;
     }
 
+    handleStdout(output: string) {
+        this.output$.next(this.output$.value + output + '\n');
+    }
+
+    handleStderr(output: string) {
+        this.error$.next(this.error$.value + output + '\n');
+    }
+
     onSubmit() {
         if (this.form.value.code) {
             this.pyodide?.then(pyodide => {
+                pyodide.setStdout({
+                    batched: this.handleStdout.bind(this),
+                });
+                pyodide.setStderr({
+                    batched: this.handleStderr.bind(this),
+                })
                 pyodide.runPythonAsync(this.form.value.code || '')
             });
         }
