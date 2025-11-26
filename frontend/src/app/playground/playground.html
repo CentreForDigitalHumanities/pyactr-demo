@@ -11,7 +11,7 @@
             <form [formGroup]="form" (submit)="onSubmit()">
                 <div class="my-3">
                     <label class="form-label" for="input-code">Simulation code</label>
-                    <textarea class="form-control font-monospace" rows="24"
+                    <textarea class="form-control font-monospace text-nowrap overflow-x-scroll" rows="24"
                         [formControl]="form.controls.code"></textarea>
                 </div>
                 <div class="my-3">
