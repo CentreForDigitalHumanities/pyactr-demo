@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { loadPyodide, PyodideAPI, version as pyodideVersion } from 'pyodide';
-import { BehaviorSubject, from, Observable } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
+import { Python } from '../shared/python';
 
 const startingCode = `import pyactr as actr
 
@@ -29,22 +29,14 @@ export class Playground implements OnInit {
         code: new FormControl<string>(startingCode, { nonNullable: true }),
     });
 
-    pyodide$?: Observable<PyodideAPI>;
+    python = inject(Python);
+    pyodide$ = this.python.pyodide$;
 
     output$ = new BehaviorSubject<string>('');
     error$ = new BehaviorSubject<string>('');
 
     ngOnInit() {
-        this.pyodide$ = from(loadPyodide({
-            indexURL: `https://cdn.jsdelivr.net/pyodide/v${pyodideVersion}/full/`,
-        }).then(this.installPyactr));
-    }
-
-    async installPyactr(pyodide: PyodideAPI): Promise<PyodideAPI> {
-        await pyodide.loadPackage('micropip');
-        const micropip = pyodide.pyimport('micropip');
-        await micropip.install('pyactr');
-        return pyodide;
+        this.pyodide$ = this.python.pyodide$;
     }
 
     handleStdout(output: string) {
@@ -59,7 +51,7 @@ export class Playground implements OnInit {
         if (this.form.value.code) {
             this.output$.next('');
             this.error$.next('');
-            this.pyodide$?.subscribe(pyodide => {
+            this.pyodide$.subscribe(pyodide => {
                 pyodide.setStdout({
                     batched: this.handleStdout.bind(this),
                 });
