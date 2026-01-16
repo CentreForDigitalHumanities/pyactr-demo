@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { loadPyodide, PyodideAPI, version as pyodideVersion } from 'pyodide';
 import { from, Observable, shareReplay } from 'rxjs';
 
 /** service to provide Pyodide with pyactr installed */
@@ -9,7 +8,7 @@ import { from, Observable, shareReplay } from 'rxjs';
 export class Python {
     pyodide$: Observable<PyodideAPI>;
 
-    private pyodideUrl = `https://cdn.jsdelivr.net/pyodide/v${pyodideVersion}/full/`;
+    private pyodideUrl = `https://cdn.jsdelivr.net/pyodide/v0.29.1/full/`;
 
     constructor() {
         this.pyodide$ = from(
