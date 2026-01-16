@@ -5,7 +5,7 @@
         "build": "ng build",
         "prebuild": "node ./build/build-pre.js",
         "watch": "ng build --watch",
-        "test": "ng test",
+        "test": "ng test --watch false",
         "pretest": "yarn prebuild",
         "preserve": "yarn prebuild",
         "serve": "ng serve",
