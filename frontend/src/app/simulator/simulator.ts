@@ -1,8 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { BehaviorSubject } from 'rxjs';
-import { Python } from '../shared/python';
+import { Simulation } from './simulation';
 
 const startingCode = `import pyactr as actr
 
@@ -21,45 +20,25 @@ print(goal)
         CommonModule,
         ReactiveFormsModule,
     ],
+    providers: [
+        Simulation
+    ],
     templateUrl: './simulator.html',
     styleUrl: './simulator.scss',
 })
-export class Simulator implements OnInit {
+export class Simulator {
     form = new FormGroup({
         code: new FormControl<string>(startingCode, { nonNullable: true }),
     });
 
-    python = inject(Python);
-    pyodide$ = this.python.pyodide$;
-
-    output$ = new BehaviorSubject<string>('');
-    error$ = new BehaviorSubject<string>('');
-
-    ngOnInit() {
-        this.pyodide$ = this.python.pyodide$;
-    }
-
-    handleStdout(output: string) {
-        this.output$.next(this.output$.value + output + '\n');
-    }
-
-    handleStderr(output: string) {
-        this.error$.next(this.error$.value + output + '\n');
-    }
+    simulation = inject(Simulation);
+    loading$ = this.simulation.loading$;
+    output$ = this.simulation.output$;
+    error$ = this.simulation.error$;
 
     onSubmit() {
         if (this.form.value.code) {
-            this.output$.next('');
-            this.error$.next('');
-            this.pyodide$.subscribe(pyodide => {
-                pyodide.setStdout({
-                    batched: this.handleStdout.bind(this),
-                });
-                pyodide.setStderr({
-                    batched: this.handleStderr.bind(this),
-                })
-                pyodide.runPythonAsync(this.form.value.code || '')
-            });
+            this.simulation.run(this.form.value.code);
         }
     }
 }
