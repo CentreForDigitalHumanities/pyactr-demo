@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 import { Home } from './home/home';
-import { Playground } from './playground/playground';
+import { Simulator } from './simulator/simulator';
 
 export const routes: Routes = [
     {
@@ -8,8 +8,8 @@ export const routes: Routes = [
         component: Home,
     },
     {
-        path: 'playground',
-        component: Playground,
+        path: 'run',
+        component: Simulator,
     },
     {
         path: '',

@@ -16,15 +16,15 @@ print(goal)
 `;
 
 @Component({
-    selector: 'app-playground',
+    selector: 'app-simulator',
     imports: [
         CommonModule,
         ReactiveFormsModule,
     ],
-    templateUrl: './playground.html',
-    styleUrl: './playground.scss',
+    templateUrl: './simulator.html',
+    styleUrl: './simulator.scss',
 })
-export class Playground implements OnInit {
+export class Simulator implements OnInit {
     form = new FormGroup({
         code: new FormControl<string>(startingCode, { nonNullable: true }),
     });
