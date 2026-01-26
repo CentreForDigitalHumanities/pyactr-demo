@@ -2,18 +2,15 @@
 
 Create and Run ACT-R cognitive models
 
-This is a server side web application based on [Django][1] and [Django REST framework][2] (DRF). Its primary purpose is to provide a JSON API with authentication and authorization, in order to support a separate frontend application.
+This is a server side web application based on [Django](https://www.djangoproject.com). It is a stripped-down version of the backend on the [Cookiecutter web app](https://github.com/CentreForDigitalHumanities/cookiecutter-webapp-deluxe). This application does not require a backend; I kept a stripped-down Django project for compatability with our deployment module; this might be removed later.
 
-[1]: https://www.djangoproject.com
-[2]: https://www.django-rest-framework.org
+Documentation below is taken from the default app. I have removed some parts that do not apply. As a general note, it's generally not necessary to run Django during development.
 
-
-## Before you start
+## Prerequisites
 
 You need to install the following software:
 
- - PostgreSQL >= 10, client, server and C libraries
- - Python >= 3.8, <= 3.10
+ - Python >= 3.11
  - virtualenv
  - WSGI-compatible webserver (deployment only)
  - [Visual C++ for Python][14] (Windows only)
@@ -23,37 +20,21 @@ You need to install the following software:
 
 ## How it works
 
-The `pyactr_demo` package is our "project" in Django jargon. It contains all central administration. The `settings`, `urls` and `wsgi` modules inside this package play the same roles as in any Django project. The `settings` module contains defaults that can be immediately used in development, but should be overridden in production. The `urls` module registers DRF [viewsets][3] besides the regular Django registrations.
-
-[3]: https://www.django-rest-framework.org/api-guide/viewsets/
+The `pyactr_demo` package is our "project" in Django jargon. It contains all central administration. The `settings`, `urls` and `wsgi` modules inside this package play the same roles as in any Django project. The `settings` module contains defaults that can be immediately used in development, but should be overridden in production. The `urls` forwards to the frontend application.
 
 The `index` module contains a special view function which is meant to facilitate a client side application. This view will attempt to find an `index.html` file in the static folders and return it as the response. In the `urls` module, this view is configured as a global fallback route. The `index.html` should launch a client side (frontend) application that handles routing.
 
 **Note:** this backend application doesn't—and *shouldn't*—contain a root `index.html` in any of its static folders. Instead, you should add an external directory to Django's `STATICFILES_DIRS` setting which contains an `index.html` in its root, if you wish to combine this backend application with your frontend application of choice.
 
-As in any Django application, you may add an arbitrary number of "application" (Django jargon) packages next to the `pyactr_demo` package. Each "application" may contain its own `models` and `migrations`, as well as `admin`, `signals`, `validators`, `urls` etcetera. A `views` module may contain DRF [viewsets][3] instead of native Django views, in which case there should also be a [`serializers`][4] module which intermediates between the `models` and the `views`.
-
-[4]: https://www.django-rest-framework.org/api-guide/serializers/
-
-Unittest modules live directly next to the module they belong to. Each directory may contain a `conftest.py` with test fixtures available to all tests in the directory.
-
-
 ## Development
 
 ### Quickstart
 
-Create and activate a virtualenv. Ensure your working directory is the one that contains this README. Run the following commands as yourself (i.e., not in sudo mode nor with elevated privileges). You may need to [reconfigure PostgreSQL][5] and/or pass [additional arguments to `psql`][6] (in particular, your [own][7] PostgreSQL `dbname` and `username`) in order to be able to run the first command. You need to execute this sequence of commands only once after cloning the repository.
-
-[5]: https://www.postgresql.org/docs/10/auth-pg-hba-conf.html
-[6]: https://www.postgresql.org/docs/10/app-psql.html
-[7]: https://www.postgresql.org/docs/10/database-roles.html
+Create and activate a virtualenv. Ensure your working directory is the one that contains this README. Run the following commands as yourself (i.e., not in sudo mode nor with elevated privileges). You need to execute this sequence of commands only once after cloning the repository.
 
 ```console
-$ psql -f create_db.sql
 $ pip install pip-tools
 $ pip sync
-$ python manage.py migrate
-$ python manage.py createsuperuser
 ```
 
 If you are overriding the default settings, you may pass `--pythonpath` and `--settings` arguments to every invocation of `python manage.py`. `--settings` should be the name of the module (without `.py`) with your settings overrides. `--pythonpath` should be the path to the directory with your overridden settings module.
@@ -119,21 +100,12 @@ Make a copy of `pyactr_demo/settings.py` and keep it out of reach from spying ey
  - `SECRET_KEY` should change to a different but equally long and random value. It is recommended that you use [`os.urandom`][12] for this.
  - `DEBUG` **must** be `False`.
  - `ALLOWED_HOSTS` should contain the hostname(s) on which you wish to serve your application. Just hostnames, e.g. `example.com` rather than `http://example.com:88`.
- - `DATABASES['default']['PASSWORD']` should change and should also be impractically hard to guess.
  - `STATIC_ROOT` should point to a directory where you want to collect all static files.
 
 See also the [Django documentation][13].
 
 [12]: https://docs.python.org/3/library/os.html#os.urandom
 [13]: https://docs.djangoproject.com/en/1.11/ref/settings/
-
-
-### Creating the database
-
-You can follow the steps from `create_db.sql`, with two important differences:
-
- - The `createdb` permission is not needed in production, so you shouldn't include it.
- - The username, password and database name should be the same as the one in your settings overrides from the previous section.
 
 
 ### Configuring your webserver

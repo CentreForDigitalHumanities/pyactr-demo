@@ -18,12 +18,8 @@ from django.urls import path, re_path, include
 from django.contrib import admin
 from django.views.generic import RedirectView
 
-from rest_framework import routers
-
 from .index import index
 from .proxy_frontend import proxy_frontend
-
-api_router = routers.DefaultRouter()  # register viewsets with this router
 
 
 if settings.PROXY_FRONTEND:
@@ -32,9 +28,5 @@ else:
     spa_url = re_path(r'', index)
 
 urlpatterns = [
-    path('admin', RedirectView.as_view(url='/admin/', permanent=True)),
-    path('api', RedirectView.as_view(url='/api/', permanent=True)),
-    path('admin/', admin.site.urls),
-    path('api/', include(api_router.urls)),
     spa_url,  # catch-all; unknown paths to be handled by a SPA
 ]

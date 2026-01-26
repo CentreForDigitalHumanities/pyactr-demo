@@ -2,14 +2,11 @@
 
 import os
 import os.path as op
-import glob
-import json
 import platform
 import sys
 import subprocess
 import shlex
-import shutil
-import re
+
 
 SLUG = 'pyactr_demo'
 WINDOWS = (platform.system() == 'Windows')
@@ -72,33 +69,22 @@ class Command(object):
 def main(argv):
     already_in_project, cd_into_project = prepare_cwd()
     venv, create_virtualenv, activate_venv = prepare_virtualenv()
-    pip_tools = backpack = funcpack = False
+    pip_tools = backpack = False
     if venv:
         pip_tools = install_pip_tools()
         backpack = install_backend_packages()
-        funcpack = install_functest_packages()
     frontpack = install_frontend_packages()
-    db, create_db = prepare_db()
-    migrate = superuser = False
-    if db and backpack:
-        migrate = run_migrations()
-        if migrate:
-            superuser = create_superuser()
     main_branch = track_main()
     gitflow = False
     if main_branch:
         gitflow = setup_gitflow()
-    if not all([gitflow, superuser, frontpack, funcpack, pip_tools]):
+    if not all([gitflow, frontpack, pip_tools]):
         print('\nPlease read {} for information on failed commands.'.format(LOGFILE_NAME))
     print('\nAlmost ready to go! Just a couple more commands to run:')
     if not already_in_project: print(cd_into_project)
     if not venv: print(create_virtualenv)
     print(activate_venv)
-    if not (pip_tools and backpack and frontpack and funcpack): print(install_all_packages)
-    if not db:
-        print(create_db)
-    if not migrate: print(run_migrations)
-    if not superuser: print(create_superuser)
+    if not (pip_tools and backpack and frontpack): print(install_all_packages)
     if not main_branch: print(track_main)
     if not gitflow: print(setup_gitflow)
     print(yarn_start)
@@ -156,148 +142,6 @@ def adopt_virtualenv(env_path):
     os.environ.pop('__PYVENV_LAUNCHER__', None)
 
 
-def prepare_db():
-    default_cmd = 'psql'
-    psql_cmd = prompt('psql_command', default_cmd)
-    create_command = make_create_db_command(psql_cmd)
-    success = create_command()
-    return success, create_command
-
-def make_create_db_command(psql_cmd):
-    # psql does not properly indicate failure; it always exits with 0.
-    # Fortunately, it is one of the last commands.
-    return Command(
-        'Create the database',
-        psql_cmd + ' -f ' + 'backend/create_db.sql',
-    )
-
-
-def merge_json(target, source):
-    for key, value in source.items():
-        if value is None:
-            del target[key]
-        elif key in target and isinstance(target[key], dict) and \
-                isinstance(source[key], dict):
-            merge_json(target[key], source[key])
-        else:
-            target[key] = value
-    return target
-
-
-def activate_frontend():
-    framework = 'angular'
-    include_authentication = 'Yes, please!' == "Yes, please!"
-    os.rename('package.angular.json', 'package.json')
-
-    if framework == 'backbone':
-        os.rename('frontend.backbone', 'frontend')
-        shutil.move(op.join('frontend', 'proxy.json'), 'proxy.json')
-        override_json('package')
-
-        if include_authentication:
-            print('No authentication for Backbone frontend available yet.')
-
-    elif framework == 'angular':
-        project_name = 'pyactr_demo'.replace('_', '-')
-        Command(
-            'Install dependencies',
-            ['yarn', 'install', '--ignore-scripts']
-        )()
-        Command(
-            'Creating project',
-            ['yarn', 'ng', 'new', project_name, '--prefix=pa',
-                '--ssr',
-                '--skip-git=true',
-                '--skip-install=true',
-                '--package-manager=yarn',
-                '--style=scss',
-                '--routing=true']
-        )()
-        shutil.copytree('frontend.angular', project_name, dirs_exist_ok=True)
-        os.rename(project_name, 'frontend')
-        shutil.move(op.join('frontend', 'proxy.conf.json'), 'proxy.conf.json')
-        override_json('package')
-        Command(
-            'Install frontend dependencies using Yarn',
-            ['yarn'],
-            cwd="frontend"
-        )()
-        # Remove favicon.ico
-        os.remove(os.path.join('frontend', 'src', 'favicon.ico'))
-        # Remove editorconfig
-        os.remove(os.path.join('frontend', '.editorconfig'))
-        Command(
-            'ng add @angular/localize',
-            ['yarn', 'ng', 'add', '@angular/localize', '--skip-confirmation'],
-            cwd="frontend"
-        )()
-
-        if not include_authentication:
-            remove_ng_authentication_files()
-
-        override_json('angular')
-        Command(
-            'Creating localizations',
-            ['yarn', 'i18n'],
-            cwd="frontend"
-        )()
-        for lang in 'en:English'.split(','):
-            [code, lang_name] = lang.split(':')
-            with open(f'frontend/locale/messages.xlf', 'r') as file:
-                messages = file.read()
-            if code != 'en':
-                with open(f'frontend/locale/messages.{code}.xlf', 'w') as file:
-                    # add the target-language attribute after the source-language attribute
-                    targeted = re.sub(r'(source-language="[^"]+"[^>]*)', f'\\g<1> target-language="{code}"', messages)
-                    try:
-                        with open(f'frontend/locale/messages.{code}.json', 'r') as pretranslated:
-                            translations = json.load(pretranslated)
-                            for key, value in translations.items():
-                                targeted = targeted.replace(f'<source>{key}</source>', f'<source>{key}</source>\n        <target state="translated">{value}</target>')
-                        os.remove(f'frontend/locale/messages.{code}.json')
-                    except FileNotFoundError:
-                        pass
-                    file.write(targeted)
-        if '4200' != '4200':
-            Command(
-                'Set frontend port',
-                ['yarn', 'ng', 'config', "projects.pyactr-demo.architect.serve.options.port", '4200'],
-                cwd="frontend"
-            )()
-    else:
-        print('Unknown framework angular specified!')
-    # remove other frameworks
-    for path in glob.glob("frontend.*"):
-        shutil.rmtree(path)
-    for path in glob.glob("package.*.json"):
-        os.remove(path)
-
-
-def remove_ng_authentication_files():
-    print('Removing authentication files from frontend...')
-    shutil.rmtree(op.join('frontend', 'src', 'app', 'guards'))
-    shutil.rmtree(op.join('frontend', 'src', 'app', 'menu', 'user-menu'))
-    shutil.rmtree(op.join('frontend', 'src', 'app', 'toast-container'))
-    shutil.rmtree(op.join('frontend', 'src', 'app', 'user'))
-    os.remove(op.join('frontend', 'src', 'app', 'services', 'auth.service.ts'))
-    os.remove(op.join('frontend', 'src', 'app', 'services', 'auth.service.spec.ts'))
-    os.remove(op.join('frontend', 'src', 'app', 'services', 'toast.service.ts'))
-    os.remove(op.join('frontend', 'src', 'app', 'services', 'toast.service.spec.ts'))
-
-
-def override_json(filename):
-    if os.path.isfile(f'frontend/{filename}.overwrite.json'):
-        print(f'Overriding {filename}.json')
-        with open(f'frontend/{filename}.overwrite.json', 'r') as file:
-            overwrite = json.load(file)
-        with open(f'frontend/{filename}.json', 'r') as file:
-            data = json.load(file)
-        with open(f'frontend/{filename}.json', 'w') as file:
-            merge_json(data, overwrite)
-            json.dump(data, file, indent=4)
-        os.remove(f'frontend/{filename}.overwrite.json')
-
-
 install_pip_tools = Command(
     'Install pip-tools',
     ['yarn', 'preinstall'],
@@ -308,38 +152,12 @@ install_backend_packages = Command(
     ['yarn', 'install-back'],
 )
 
-install_functest_packages = Command(
-    'Install the functional test requirements',
-    ['yarn', 'install-func'],
-)
-
 install_frontend_packages = Command(
     'Install the frontend packages',
     ['yarn', 'fyarn'],
 )
 
 install_all_packages = Command('Install all packages', ['yarn'])
-
-run_migrations = Command(
-    'Run the initial migrations',
-    ['yarn', 'django', 'migrate'],
-)
-
-# Github Actions sets "CI" environment variable
-if os.environ.get('CI'):
-    create_superuser = Command(
-        'Skip creating the superuser',
-        ['yarn', 'back', ':'],  # ':' for no-op
-        stdout=None,  # share stdout and stderr with this process
-        stderr=None,
-    )
-else:
-    create_superuser = Command(
-        'Create the superuser',
-        ['yarn', 'django', 'createsuperuser'],
-        stdout=None,  # share stdout and stderr with this process
-        stderr=None,
-    )
 
 track_main = Command(
     'Create origin-tracking main branch',
