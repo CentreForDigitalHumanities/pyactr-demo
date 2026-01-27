@@ -1,6 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { BehaviorSubject, map, startWith, take } from 'rxjs';
 import { Python } from '../shared/python';
+import { importPyactrSnippet } from '../shared/actr-model';
 
 @Injectable()
 export class Simulation {
@@ -22,6 +23,10 @@ export class Simulation {
         this.code$.next(code);
         this.resetOutput();
         this.pyodide$.subscribe(pyodide => {
+            pyodide.setStdout({batched: this.ignore});
+            pyodide.setStderr({batched: this.ignore});
+            pyodide.runPython(importPyactrSnippet);
+
             pyodide.setStdout({
                 batched: this.handleStdout.bind(this),
             });
@@ -37,11 +42,13 @@ export class Simulation {
         this.error$.next('');
     }
 
-    private handleStdout(output: string) {
+    private ignore(): void {}
+
+    private handleStdout(output: string): void {
         this.output$.next(this.output$.value + output + '\n');
     }
 
-    private handleStderr(output: string) {
+    private handleStderr(output: string): void {
         this.error$.next(this.error$.value + output + '\n');
     }
 }
