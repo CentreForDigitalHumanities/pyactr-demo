@@ -37,8 +37,6 @@ export class Simulator {
     error$ = this.simulation.error$;
 
     onSubmit() {
-        if (this.form.value.code) {
-            this.simulation.run(this.form.value.code);
-        }
+        this.simulation.run(this.form.value.code || '');
     }
 }
