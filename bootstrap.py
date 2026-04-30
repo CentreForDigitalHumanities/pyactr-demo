@@ -68,23 +68,16 @@ class Command(object):
 
 def main(argv):
     already_in_project, cd_into_project = prepare_cwd()
-    venv, create_virtualenv, activate_venv = prepare_virtualenv()
-    pip_tools = backpack = False
-    if venv:
-        pip_tools = install_pip_tools()
-        backpack = install_backend_packages()
     frontpack = install_frontend_packages()
     main_branch = track_main()
     gitflow = False
     if main_branch:
         gitflow = setup_gitflow()
-    if not all([gitflow, frontpack, pip_tools]):
+    if not all([gitflow, frontpack]):
         print('\nPlease read {} for information on failed commands.'.format(LOGFILE_NAME))
     print('\nAlmost ready to go! Just a couple more commands to run:')
     if not already_in_project: print(cd_into_project)
-    if not venv: print(create_virtualenv)
-    print(activate_venv)
-    if not (pip_tools and backpack and frontpack): print(install_all_packages)
+    if not frontpack: print(install_all_packages)
     if not main_branch: print(track_main)
     if not gitflow: print(setup_gitflow)
     print(yarn_start)
@@ -103,54 +96,6 @@ def prepare_cwd():
     relative_path = op.relpath(project_root, invocation_dir)
     cd_into_project = Command('', ['cd', relative_path])
     return False, cd_into_project
-
-
-def prepare_virtualenv():
-    default_env = '.env'
-    env_path = prompt('virtualenv', default_env)
-    default_cmd = 'virtualenv {} --prompt="({}) "'.format(env_path, SLUG)
-    env_cmd = prompt('virtualenv_command', default_cmd)
-    create_command = make_create_venv_command(env_cmd)
-    activate_command = make_activate_venv_command(env_path)
-    success = create_command()
-    if success:
-        adopt_virtualenv(env_path)
-    return success, create_command, activate_command
-
-
-def make_create_venv_command(venv_cmd):
-    return Command('Create the virtualenv', venv_cmd)
-
-
-def make_activate_venv_command(venv_path):
-    activate_helper = ([] if WINDOWS else ['source'])
-    return Command(
-        '',
-        activate_helper + [op.join(venv_path, VIRTUALENV_BINDIR, 'activate')],
-    )
-
-
-def adopt_virtualenv(env_path):
-    """ Enable the virtualenv for our own subprocesses. """
-    # first lines are a quick imitation of a local bin/activate script
-    venv_abs = op.abspath(env_path)
-    os.environ['VIRTUAL_ENV'] = venv_abs
-    python_bindir = op.join(venv_abs, VIRTUALENV_BINDIR)
-    os.environ['PATH'] = os.pathsep.join([python_bindir, os.environ['PATH']])
-    os.environ.pop('PYTHONHOME', None)
-    # next line is a fix for https://bugs.python.org/issue22490
-    os.environ.pop('__PYVENV_LAUNCHER__', None)
-
-
-install_pip_tools = Command(
-    'Install pip-tools',
-    ['yarn', 'preinstall'],
-)
-
-install_backend_packages = Command(
-    'Install the backend requirements',
-    ['yarn', 'install-back'],
-)
 
 install_frontend_packages = Command(
     'Install the frontend packages',
