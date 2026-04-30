@@ -1,7 +1,7 @@
 const path = require('path');
 const colors = require('colors/safe');
 const fs = require('fs');
-const appVersion = require('../../package.json').version;
+const appVersion = require('../package.json').version;
 
 console.log(colors.cyan('\nRunning pre-build tasks'));
 
