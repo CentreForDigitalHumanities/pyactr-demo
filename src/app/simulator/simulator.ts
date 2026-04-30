@@ -1,7 +1,7 @@
-import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { Simulation } from './simulation';
+import { SharedModule } from '../shared/shared-module';
 
 const startingCode = `import pyactr as actr
 
@@ -17,7 +17,7 @@ print(goal)
 @Component({
     selector: 'app-simulator',
     imports: [
-        CommonModule,
+        SharedModule,
         ReactiveFormsModule,
     ],
     providers: [

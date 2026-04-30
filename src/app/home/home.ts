@@ -1,8 +1,9 @@
 import { Component } from '@angular/core';
+import { SharedModule } from '../shared/shared-module';
 
 @Component({
     selector: 'app-home',
-    imports: [],
+    imports: [SharedModule],
     templateUrl: './home.html',
     styleUrl: './home.scss',
 })
