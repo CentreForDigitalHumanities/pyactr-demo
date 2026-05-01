@@ -1,28 +1,29 @@
 <nav class="navbar navbar-expand-lg bg-body-tertiary" aria-label="main navigation"
     data-bs-theme="dark">
     <div class="container-fluid">
-        <div class="navbar-brand">
-                PyACT-R demo
-        </div>
-
         <button class="navbar-toggler" type="button"
             aria-controls="navigation-links"
             [attr.aria-expanded]="!navCollapse"
             aria-label="toggle navigation"
-            (click)="navCollapse != navCollapse">
+            (click)="navCollapse = !navCollapse">
             <span class="navbar-toggler-icon"></span>
         </button>
 
         <div id="navigation-links" class="navbar-collapse" [ngbCollapse]="navCollapse">
             <ul class="navbar-nav">
                 <li class="nav-item">
-                    <a [routerLink]="['/home']" routerLinkActive="active" class="nav-link">
-                        Home
+                    <a [routerLink]="['/run']" routerLinkActive="active" class="nav-link">
+                        Playground
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a [routerLink]="['/run']" routerLinkActive="active" class="nav-link">
-                        Run
+                    <a [routerLink]="['/examples']" routerLinkActive="active" class="nav-link">
+                        Examples
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a [routerLink]="['/about']" routerLinkActive="active" class="nav-link">
+                        About
                     </a>
                 </li>
             </ul>
