@@ -1,6 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { SimulationManager } from '../simulation-manager';
 import { SharedModule } from '../../shared/shared-module';
+import { of, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-output-console',
@@ -10,6 +11,14 @@ import { SharedModule } from '../../shared/shared-module';
 })
 export class OutputConsole {
     simulation = inject(SimulationManager);
-    output$ = this.simulation.output$;
-    error$ = this.simulation.error$;
+    output$ = this.simulation.current$.pipe(
+        switchMap(simulation =>
+            simulation ? simulation.output$ : of('')
+        ),
+    );
+    error$ = this.simulation.current$.pipe(
+        switchMap(simulation =>
+            simulation ? simulation.error$ : of('')
+        ),
+    );;
 }
