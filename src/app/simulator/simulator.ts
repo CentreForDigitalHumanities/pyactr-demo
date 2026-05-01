@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { Simulation } from './simulation';
+import { SimulationManager } from './simulation-manager';
 import { SharedModule } from '../shared/shared-module';
 import { OutputConsole } from './output-console/output-console';
 
@@ -23,7 +23,7 @@ print(goal)
         OutputConsole,
     ],
     providers: [
-        Simulation
+        SimulationManager
     ],
     templateUrl: './simulator.html',
     styleUrl: './simulator.scss',
@@ -33,7 +33,7 @@ export class Simulator {
         code: new FormControl<string>(startingCode, { nonNullable: true }),
     });
 
-    simulation = inject(Simulation);
+    simulation = inject(SimulationManager);
     loading$ = this.simulation.loading$;
 
     onSubmit() {

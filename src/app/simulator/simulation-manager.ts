@@ -4,7 +4,7 @@ import { Python } from '../shared/python';
 import { importPyactr } from '../shared/actr';
 
 @Injectable()
-export class Simulation {
+export class SimulationManager {
     code$ = new BehaviorSubject<string>('');
 
     output$ = new BehaviorSubject<string>('');
@@ -41,6 +41,7 @@ export class Simulation {
     }
 
     private handleStdout(output: string): void {
+        console.log(output, this.output$.value);
         this.output$.next(this.output$.value + output + '\n');
     }
 

@@ -1,17 +1,17 @@
 import { TestBed } from '@angular/core/testing';
 
-import { Simulation } from './simulation';
+import { SimulationManager } from './simulation-manager';
 import { SharedTestingModule } from '../shared/shared-module';
 
 describe('Simulation', () => {
-    let service: Simulation;
+    let service: SimulationManager;
 
     beforeEach(() => {
         TestBed.configureTestingModule({
             imports: [SharedTestingModule],
-            providers: [Simulation],
+            providers: [SimulationManager],
         });
-        service = TestBed.inject(Simulation);
+        service = TestBed.inject(SimulationManager);
     });
 
     it('should be created', () => {

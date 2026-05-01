@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { Simulation } from '../simulation';
+import { SimulationManager } from '../simulation-manager';
 import { SharedModule } from '../../shared/shared-module';
 
 @Component({
@@ -9,7 +9,7 @@ import { SharedModule } from '../../shared/shared-module';
   styleUrl: './output-console.scss',
 })
 export class OutputConsole {
-    simulation = inject(Simulation);
+    simulation = inject(SimulationManager);
     output$ = this.simulation.output$;
     error$ = this.simulation.error$;
 }
