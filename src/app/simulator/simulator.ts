@@ -2,6 +2,7 @@ import { Component, inject } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { Simulation } from './simulation';
 import { SharedModule } from '../shared/shared-module';
+import { OutputConsole } from './output-console/output-console';
 
 const startingCode = `import pyactr as actr
 
@@ -19,6 +20,7 @@ print(goal)
     imports: [
         SharedModule,
         ReactiveFormsModule,
+        OutputConsole,
     ],
     providers: [
         Simulation
@@ -33,8 +35,6 @@ export class Simulator {
 
     simulation = inject(Simulation);
     loading$ = this.simulation.loading$;
-    output$ = this.simulation.output$;
-    error$ = this.simulation.error$;
 
     onSubmit() {
         this.simulation.run(this.form.value.code || '');

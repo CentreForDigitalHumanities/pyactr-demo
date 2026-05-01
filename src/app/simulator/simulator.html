@@ -20,23 +20,12 @@
             </form>
         </div>
         <div class="col-lg-6">
-            <h2>Output</h2>
+            <h2 class="mb-3">Output</h2>
 
             @if (loading$ | async) {
                 <p>Loading libraries...</p>
             } @else {
-                @if (output$ | async; as output) {
-                    <div class="bg-light p-3 my-4 rounded">
-                        <pre>{{output}}</pre>
-                    </div>
-                }
-
-                @if (error$ | async; as error) {
-                    <h3>Error messages</h3>
-                    <div class="bg-danger-subtle my-4 p-3 rounded">
-                        <pre>{{error}}</pre>
-                    </div>
-                }
+                <app-output-console />
             }
 
         </div>
