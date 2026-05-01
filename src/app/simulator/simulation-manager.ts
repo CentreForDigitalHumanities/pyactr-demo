@@ -1,11 +1,20 @@
 import { inject, Injectable } from '@angular/core';
-import { BehaviorSubject, map, Observable, startWith, take } from 'rxjs';
+import { BehaviorSubject, map, Observable, ReplaySubject, scan, startWith, take } from 'rxjs';
 import { Python } from '../shared/python';
 import { importPyactr } from '../shared/actr';
 
+export interface ConsoleEvent {
+    type: 'out' | 'err';
+    value: string;
+}
+
 export class Simulation {
-    output$ = new BehaviorSubject<string>('');
-    error$ = new BehaviorSubject<string>('');
+
+    private consoleStream$ = new ReplaySubject<ConsoleEvent>();
+    console$: Observable<ConsoleEvent[]> = this.consoleStream$.pipe(
+        scan((acc, curr) => [...acc, curr], [] as ConsoleEvent[]),
+        startWith([]),
+    );
 
     constructor(
         pyodide$: Observable<PyodideAPI>,
@@ -18,22 +27,29 @@ export class Simulation {
 
     private start(pyodide: PyodideAPI) {
         importPyactr(pyodide);
-
         pyodide.setStdout({
             batched: this.handleStdOut.bind(this),
         });
         pyodide.setStderr({
             batched: this.handleStdErr.bind(this),
         });
-        pyodide.runPythonAsync(this.code);
+        pyodide.runPythonAsync(this.code).then(
+            this.onExecutionComplete.bind(this),
+        );
     }
 
-    private handleStdOut(output: string): void {
-        this.output$.next(this.output$.value + output + '\n');
+    private handleStdOut(value: string): void {
+        console.log('stdout:', value);
+        this.consoleStream$.next({ type: 'out', value })
     }
 
-    private handleStdErr(output: string): void {
-        this.error$.next(this.error$.value + output + '\n');
+    private handleStdErr(value: string): void {
+        console.error('stderr:', value);
+        this.consoleStream$.next({ type: 'err', value });
+    }
+
+    private onExecutionComplete() {
+        this.consoleStream$.complete();
     }
 }
 

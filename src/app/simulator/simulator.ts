@@ -33,10 +33,10 @@ export class Simulator {
         code: new FormControl<string>(startingCode, { nonNullable: true }),
     });
 
-    simulation = inject(SimulationManager);
-    loading$ = this.simulation.loading$;
+    simulationManager = inject(SimulationManager);
+    loading$ = this.simulationManager.loading$;
 
     onSubmit() {
-        this.simulation.run(this.form.value.code || '');
+        this.simulationManager.run(this.form.value.code || '');
     }
 }

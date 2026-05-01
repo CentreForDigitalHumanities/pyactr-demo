@@ -24,10 +24,11 @@
 
             @if (loading$ | async) {
                 <p>Loading libraries...</p>
-            } @else {
-                <app-output-console />
             }
 
+            @if (simulationManager.current$ | async; as simulation) {
+                <app-output-console [console]="(simulation.console$ | async) || []" />
+            }
         </div>
     </div>
 </div>
