@@ -1,7 +1,7 @@
-import { inject, Injectable } from '@angular/core';
-import { BehaviorSubject, map, Observable, ReplaySubject, scan, startWith, take } from 'rxjs';
-import { Python } from '../shared/python';
-import { importPyactr } from '../shared/actr';
+import { Injectable, signal } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
+
+let nextID = 0;
 
 export interface ConsoleEvent {
     type: 'out' | 'err';
@@ -9,47 +9,41 @@ export interface ConsoleEvent {
 }
 
 export class Simulation {
+    id = nextID++;
 
-    private consoleStream$ = new ReplaySubject<ConsoleEvent>();
-    console$: Observable<ConsoleEvent[]> = this.consoleStream$.pipe(
-        scan((acc, curr) => [...acc, curr], [] as ConsoleEvent[]),
-        startWith([]),
-    );
+    console = signal<ConsoleEvent[]>([]);
 
     constructor(
-        pyodide$: Observable<PyodideAPI>,
+        private worker: Worker,
         public code: string
     ) {
-        pyodide$.pipe(take(1)).subscribe(
-            pyodide => this.start(pyodide)
-        );
     }
 
-    private start(pyodide: PyodideAPI) {
-        importPyactr(pyodide);
-        pyodide.setStdout({
-            batched: this.handleStdOut.bind(this),
-        });
-        pyodide.setStderr({
-            batched: this.handleStdErr.bind(this),
-        });
-        pyodide.runPythonAsync(this.code).then(
-            this.onExecutionComplete.bind(this),
-        );
+    start() {
+        this.worker.postMessage({ id: this.id, script: this.code });
+        this.worker.onmessage = ({ data }) => this.onWorkerMessage(data);
     }
 
-    private handleStdOut(value: string): void {
-        console.log('stdout:', value);
-        this.consoleStream$.next({ type: 'out', value })
+    stop() {
+        // TODO: interrupt execution
     }
 
-    private handleStdErr(value: string): void {
-        console.error('stderr:', value);
-        this.consoleStream$.next({ type: 'err', value });
-    }
+    private onWorkerMessage(data: any) {
+        // ignore messages from other simulations;
+        if (data.id != this.id) {
+            return;
+        }
 
-    private onExecutionComplete() {
-        this.consoleStream$.complete();
+        if (data.status == 'stdout') {
+            this.console.update((value) =>
+                [...value, { type: 'out', value: data.value }]
+            );
+        }
+        if (data.status == 'stderr') {
+            this.console.update((value) =>
+                [...value, { type: 'err', value: data.value }]
+            );
+        }
     }
 }
 
@@ -57,18 +51,14 @@ export class Simulation {
 export class SimulationManager {
     current$ = new BehaviorSubject<Simulation | null>(null);
 
-    private python = inject(Python);
-    private pyodide$ = this.python.pyodide$;
-
-    loading$ = this.pyodide$.pipe(
-        take(1),
-        map(() => false),
-        startWith(true),
+    private worker = new Worker(
+        new URL('./simulation.worker', import.meta.url), { type: 'classic' }
     );
 
     run(code: string) {
-        const simulation = new Simulation(this.pyodide$, code);
+        const simulation = new Simulation(this.worker, code);
         this.current$.next(simulation);
+        simulation.start();
     }
 
 }

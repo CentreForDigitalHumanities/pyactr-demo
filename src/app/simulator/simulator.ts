@@ -4,6 +4,7 @@ import { SimulationManager } from './simulation-manager';
 import { SharedModule } from '../shared/shared-module';
 import { OutputConsole } from './output-console/output-console';
 
+
 const startingCode = `import pyactr as actr
 
 playing_memory = actr.ACTRModel()
@@ -34,9 +35,9 @@ export class Simulator {
     });
 
     simulationManager = inject(SimulationManager);
-    loading$ = this.simulationManager.loading$;
 
     onSubmit() {
-        this.simulationManager.run(this.form.value.code || '');
+        const code = this.form.controls.code.value || '';
+        this.simulationManager.run(code);
     }
 }
