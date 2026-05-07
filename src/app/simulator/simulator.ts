@@ -3,6 +3,7 @@ import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { SimulationManager } from './simulation-manager';
 import { SharedModule } from '../shared/shared-module';
 import { OutputConsole } from './output-console/output-console';
+import { OutputStatus } from './output-status/output-status';
 
 
 const startingCode = `import pyactr as actr
@@ -22,6 +23,7 @@ print(goal)
         SharedModule,
         ReactiveFormsModule,
         OutputConsole,
+        OutputStatus,
     ],
     providers: [
         SimulationManager

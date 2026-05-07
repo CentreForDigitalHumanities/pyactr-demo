@@ -1,0 +1,10 @@
+<div class="bg-body-secondary p-2" role="status">
+    @if (simulation().loading()) {
+    <div class="spinner-border spinner-border-sm" aria-hidden></div>
+    Importing libraries
+} @else if (!(simulation().finished$ | async)) {
+    <div class="spinner-border spinner-border-sm" aria-hidden></div>
+    Running code...
+} @else {
+    Finished!
+}
