@@ -8,5 +8,5 @@ import { SharedModule } from '../../shared/shared-module';
     templateUrl: './output-status.html',
 })
 export class OutputStatus {
-    simulation = input.required<Simulation>();
+    simulation = input.required<Simulation | null>();
 }

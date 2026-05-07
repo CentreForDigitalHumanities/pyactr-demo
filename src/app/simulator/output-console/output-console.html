@@ -1,1 +1,9 @@
-{{ console() | json }}
+<div aria-live="polite" aria-relevant="additions">
+    @for (event of console(); track $index) {
+        <div class="px-2 py-1 my-2 rounded border"
+            [class.bg-danger-subtle]="isErr(event)"
+            [class.border-danger-subtle]="isErr(event)">
+            <pre class="mb-0">{{event.value}}</pre>
+        </div>
+    }
+</div>

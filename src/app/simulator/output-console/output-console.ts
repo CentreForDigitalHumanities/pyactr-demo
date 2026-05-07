@@ -11,4 +11,8 @@ import { SharedModule } from '../../shared/shared-module';
 })
 export class OutputConsole {
     console = input.required<ConsoleEvent[]>();
+
+    isErr(event: ConsoleEvent): boolean {
+        return event.type == 'err';
+    }
 }
