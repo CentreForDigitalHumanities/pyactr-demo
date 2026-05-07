@@ -1,5 +1,5 @@
 import { inject, Injectable, signal } from '@angular/core';
-import { BehaviorSubject, filter, Subject, takeUntil } from 'rxjs';
+import { BehaviorSubject, filter, merge, Subject, takeUntil } from 'rxjs';
 import { Python } from '../shared/python';
 
 let nextID = 0;
@@ -14,31 +14,39 @@ export class Simulation {
 
     loading = signal<boolean>(false);
     console = signal<ConsoleEvent[]>([]);
+    finished$ = new BehaviorSubject<boolean>(false);
 
-    private stop$ = new Subject<void>();
+    private interrupt$ = new Subject<void>();
 
     constructor(
         private python: Python,
         public code: string
-    ) {
-    }
+    ) { }
 
     /** Run simulation code */
     start() {
-        this.loading.set(true);
-        this.python.postMessage({ id: this.id, script: this.code });
+        const stopListening$ = merge(
+            this.interrupt$,
+            this.finished$.pipe(filter(value => value)),
+        );
         this.python.workerMessage$.pipe(
-            takeUntil(this.stop$),
+            takeUntil(stopListening$),
             filter(message => message.id == this.id), // only listen to this simulation
         ).subscribe(data => this.onWorkerMessage(data));
+
+        this.loading.set(true);
+        this.python.postMessage({ id: this.id, script: this.code });
     }
 
     /** Stop simulation. The simulation will stop listening to the Python worker.
      * TODO: also interrupt execution.
      */
     stop() {
-        this.stop$.next();
-        this.stop$.complete();
+        if (!this.interrupt$.closed) {
+            this.interrupt$.next();
+            this.interrupt$.complete();
+            this.finished$.complete();
+        }
     }
 
     private onWorkerMessage(data: any) {
@@ -56,7 +64,7 @@ export class Simulation {
             );
         }
         if (data.status == 'complete') {
-            this.stop();
+            this.finished$.next(true);
         }
     }
 }
@@ -67,10 +75,11 @@ export class SimulationManager {
 
     current$ = new BehaviorSubject<Simulation | null>(null);
 
+    /** Run a new simulation. Will stop the current simulation if there is one. */
     run(code: string) {
+        this.current$.value?.stop();
         const simulation = new Simulation(this.python, code);
         this.current$.next(simulation);
         simulation.start();
     }
-
 }
