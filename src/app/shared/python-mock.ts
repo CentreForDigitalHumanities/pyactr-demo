@@ -1,9 +1,9 @@
-import { BehaviorSubject } from "rxjs";
+import { Subject } from "rxjs";
 
-class PyodideMock implements Partial<PyodideAPI> {}
-
-/** fake Python service for testing */
+/** no-op Python service for testing */
 export class PythonMock {
-    pyodide$ = new BehaviorSubject(new PyodideMock());
+    workerMessage$ = new Subject<any>();
+
+    postMessage() {}
 }
 

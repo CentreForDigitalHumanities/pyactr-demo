@@ -1,5 +1,6 @@
-import { Injectable, signal } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { inject, Injectable, signal } from '@angular/core';
+import { BehaviorSubject, filter, Subject, takeUntil } from 'rxjs';
+import { Python } from '../shared/python';
 
 let nextID = 0;
 
@@ -13,27 +14,32 @@ export class Simulation {
 
     console = signal<ConsoleEvent[]>([]);
 
+    private stop$ = new Subject<void>();
+
     constructor(
-        private worker: Worker,
+        private python: Python,
         public code: string
     ) {
     }
 
+    /** Run simulation code */
     start() {
-        this.worker.postMessage({ id: this.id, script: this.code });
-        this.worker.onmessage = ({ data }) => this.onWorkerMessage(data);
+        this.python.postMessage({ id: this.id, script: this.code });
+        this.python.workerMessage$.pipe(
+            takeUntil(this.stop$),
+            filter(message => message.id == this.id), // only listen to this simulation
+        ).subscribe(data => this.onWorkerMessage(data));
     }
 
+    /** Stop simulation. The simulation will stop listening to the Python worker.
+     * TODO: also interrupt execution.
+     */
     stop() {
-        // TODO: interrupt execution
+        this.stop$.next();
+        this.stop$.complete();
     }
 
     private onWorkerMessage(data: any) {
-        // ignore messages from other simulations;
-        if (data.id != this.id) {
-            return;
-        }
-
         if (data.status == 'stdout') {
             this.console.update((value) =>
                 [...value, { type: 'out', value: data.value }]
@@ -44,19 +50,20 @@ export class Simulation {
                 [...value, { type: 'err', value: data.value }]
             );
         }
+        if (data.status == 'complete') {
+            this.stop();
+        }
     }
 }
 
 @Injectable()
 export class SimulationManager {
+    private python = inject(Python);
+
     current$ = new BehaviorSubject<Simulation | null>(null);
 
-    private worker = new Worker(
-        new URL('./simulation.worker', import.meta.url), { type: 'classic' }
-    );
-
     run(code: string) {
-        const simulation = new Simulation(this.worker, code);
+        const simulation = new Simulation(this.python, code);
         this.current$.next(simulation);
         simulation.start();
     }
