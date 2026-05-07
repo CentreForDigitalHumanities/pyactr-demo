@@ -54,8 +54,12 @@ class PythonRunner {
         pyodide.setStderr({
             batched: this.handleStdErr.bind(this),
         });
-        await pyodide.runPythonAsync(this.script);
-        this.post('complete');
+        try {
+            await pyodide.runPythonAsync(this.script);
+            this.post('complete');
+        } catch (err) {
+            this.post('error', err);
+        }
     }
 
     private post(status: WorkerMessageStatus, data?: any) {

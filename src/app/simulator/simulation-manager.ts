@@ -67,6 +67,13 @@ export class Simulation {
         if (data.status == 'complete') {
             this.finished$.next(true);
         }
+        if (data.status == 'error') {
+            const err = data.value as Error;
+            this.console.update((value) =>
+                [...value, { type: 'err' , value: err.message }]
+            );
+            this.finished$.next(true);
+        }
     }
 }
 
