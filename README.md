@@ -2,7 +2,7 @@
 
 [![Actions Status](https://github.com/CentreForDigitalHumanities/pyactr_demo/workflows/Unit%20tests/badge.svg)](https://github.com/CentreForDigitalHumanities/pyactr_demo/actions)
 
-Create and Run ACT-R cognitive models
+Create and Run ACT-R cognitive models in the browser using [pyactr](https://github.com/jakdot/pyactr).
 
 *This repository is a work in progress, and the README is not yet complete!*
 
