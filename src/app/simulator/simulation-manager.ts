@@ -1,6 +1,7 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { BehaviorSubject, filter, merge, Subject, takeUntil } from 'rxjs';
 import { Python } from '../shared/python';
+import { WorkerMessage } from '../shared/python-interface';
 
 let nextID = 0;
 
@@ -49,7 +50,7 @@ export class Simulation {
         }
     }
 
-    private onWorkerMessage(data: any) {
+    private onWorkerMessage(data: WorkerMessage) {
         if (data.status == 'starting') {
             this.loading.set(false);
         }

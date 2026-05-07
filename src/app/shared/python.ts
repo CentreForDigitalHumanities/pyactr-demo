@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
+import { PageMessage, WorkerMessage } from './python-interface';
 
 /** service to provide Pyodide with pyactr installed */
 @Injectable({
@@ -12,14 +13,14 @@ export class Python {
     );
 
     /** Messages sent by by the web worker */
-    workerMessage$ = new Subject<any>();
+    workerMessage$ = new Subject<WorkerMessage>();
 
     constructor() {
         this.worker.onmessage = ({data}) => this.onWorkerMessage(data);
     }
 
     /** Post a message to the Python worker, e.g. to start a script */
-    postMessage(data: any) {
+    postMessage(data: PageMessage): void {
         this.worker.postMessage(data);
     }
 

@@ -1,5 +1,7 @@
 /// <reference lib="webworker" />
 
+import { type WorkerMessageStatus, type WorkerMessage, type PageMessage } from "./python-interface";
+
 importScripts('https://cdn.jsdelivr.net/pyodide/v0.29.1/full/pyodide.js');
 
 type PyodideAPI = {
@@ -42,10 +44,10 @@ class PythonRunner {
     ) { }
 
     async run() {
-        postMessage({ id: this.id, status: 'loading' });
+        this.post('loading');
         const pyodide = await loadPythonAndPackages();
         initialImport(pyodide);
-        postMessage({ id: this.id, status: 'starting' });
+        this.post('starting');
         pyodide.setStdout({
             batched: this.handleStdOut.bind(this),
         });
@@ -53,22 +55,31 @@ class PythonRunner {
             batched: this.handleStdErr.bind(this),
         });
         await pyodide.runPythonAsync(this.script);
-        postMessage({ id: this.id, status: 'complete' });
+        this.post('complete');
+    }
+
+    private post(status: WorkerMessageStatus, data?: any) {
+        const message: WorkerMessage = {
+            id: this.id,
+            status,
+            value: data,
+        };
+        postMessage(message);
     }
 
     private handleStdOut(value: string): void {
         console.log('stdout:', value);
-        postMessage({ id: this.id, status: 'stdout', value });
+        this.post('stdout', value);
     }
 
     private handleStdErr(value: string): void {
         console.error('stderr:', value);
-        postMessage({ id: this.id, status: 'stderr', value });
+        this.post('stderr', value);
     }
 
 }
 
-addEventListener('message', async ({ data }: { data: { id: number, script: string }}) => {
+addEventListener('message', async ({ data }: { data: PageMessage}) => {
     const runner = new PythonRunner(data.id, data.script);
     runner.run();
 });
