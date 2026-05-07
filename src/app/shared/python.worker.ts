@@ -2,6 +2,19 @@
 
 importScripts('https://cdn.jsdelivr.net/pyodide/v0.29.1/full/pyodide.js');
 
+type PyodideAPI = {
+    loadPackage: (names: string | string[], options?: any) => Promise<void>;
+    pyimport: (mode_name: any) => any;
+    runPython: (code: any, options?: any) => any;
+    runPythonAsync: (code: any, options?: any) => Promise<any>;
+    setStdin: (options?: any) => any;
+    setStdout: (options?: any) => any;
+    setStderr: (options?: any) => any;
+};
+
+declare var loadPyodide: (options: any) => Promise<PyodideAPI>;
+
+
 const loadPythonAndPackages = async (): Promise<PyodideAPI> => {
     const pyodide = await loadPyodide({ indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.29.1/full/' });
     await pyodide.loadPackage('micropip');
