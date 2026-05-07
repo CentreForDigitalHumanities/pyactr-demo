@@ -17,9 +17,9 @@
             <h2 class="mb-3">Output</h2>
 
             @if (simulationManager.current$ | async; as simulation) {
-                <!-- @if (loading$ | async) {
+                @if (simulation.loading()) {
                     <p>Loading libraries...</p>
-                } -->
+                }
                 <app-output-console [console]="simulation.console()" />
             }
 

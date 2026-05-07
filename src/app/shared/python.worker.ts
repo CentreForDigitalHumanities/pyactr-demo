@@ -10,6 +10,18 @@ const loadPythonAndPackages = async (): Promise<PyodideAPI> => {
     return pyodide;
 }
 
+const importPyactrSnippet = `
+import pyactr as actr
+`;
+
+/** Run initial pyactr import.
+ * This can be done before connecting the stdout/stderr output, so any warnings that
+ * pop up here (e.g. DeprecationWarning) are not shown to the user.
+ */
+const initialImport = (pyodide: PyodideAPI) => {
+    pyodide.runPython(importPyactrSnippet);
+}
+
 class PythonRunner {
     constructor(
         public id: number,
@@ -17,8 +29,10 @@ class PythonRunner {
     ) { }
 
     async run() {
-        postMessage({ id: this.id, status: 'starting' });
+        postMessage({ id: this.id, status: 'loading' });
         const pyodide = await loadPythonAndPackages();
+        initialImport(pyodide);
+        postMessage({ id: this.id, status: 'starting' });
         pyodide.setStdout({
             batched: this.handleStdOut.bind(this),
         });

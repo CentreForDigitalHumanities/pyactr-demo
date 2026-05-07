@@ -12,6 +12,7 @@ export interface ConsoleEvent {
 export class Simulation {
     id = nextID++;
 
+    loading = signal<boolean>(false);
     console = signal<ConsoleEvent[]>([]);
 
     private stop$ = new Subject<void>();
@@ -24,6 +25,7 @@ export class Simulation {
 
     /** Run simulation code */
     start() {
+        this.loading.set(true);
         this.python.postMessage({ id: this.id, script: this.code });
         this.python.workerMessage$.pipe(
             takeUntil(this.stop$),
@@ -40,6 +42,9 @@ export class Simulation {
     }
 
     private onWorkerMessage(data: any) {
+        if (data.status == 'starting') {
+            this.loading.set(false);
+        }
         if (data.status == 'stdout') {
             this.console.update((value) =>
                 [...value, { type: 'out', value: data.value }]
