@@ -12,9 +12,7 @@ Create and Run ACT-R cognitive models in the browser using [pyactr](https://gith
 
 ## Getting started
 
-PyACT-R demo is a web application: it can be accessed using a web browser.
-
-*If you are hosting PyACT-R demo anywhere, provide a URL and any additional info.*
+PyACT-R demo is a web application: it can be accessed using a web browser at [centrefordigitalhumanities.github.io/pyactr-demo/](https://centrefordigitalhumanities.github.io/pyactr-demo/). This version is a work in progress.
 
 You can also run PyACT-R demo locally or host it yourself. Be aware that this is a more advanced option. See [CONTRIBUTING.md](./CONTRIBUTING.md) for information about setting up a local server or configuring deployment.
 
@@ -36,6 +34,6 @@ To cite this repository, please use the metadata provided in [CITATION.cff](./CI
 
 ## Contact
 
-PyACT-R demo is developed by [Research Software Lab, Centre for Digital Humanities, Utrecht University](https://cdh.uu.nl/about/research-software-lab/).
+PyACT-R demo is developed by [Research Software Lab, Centre for Digital Humanities, Utrecht University](https://cdh.uu.nl/about/research-software-lab/). For feedback or suggestions, feel free to create an issue on this repository, or contact the Centre for Digital Humanities.
 
-*Include contact information. You can also provide clear instructions for how users can provide feedback, contribute, or suggest improvements to your work.*
+For feedback concerning the pyactr Python package, please see the [pyactr repository](https://github.com/jakdot/pyactr).

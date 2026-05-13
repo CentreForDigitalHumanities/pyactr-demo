@@ -63,13 +63,13 @@ Run unit tests:
 $ yarn test
 ```
 
-Build the project:
+Compile the project:
 
 ```sh
 ng build
 ```
 
-This will compile the project and store it in the `dist/` directory.
+This will compile the project for distribution and store it in the `dist/` directory.
 
 Scaffold a new component:
 
@@ -87,3 +87,16 @@ For more information, see:
 
 - [Managing dependencies with Yarn](https://classic.yarnpkg.com/en/docs/managing-dependencies)
 - [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli)
+
+## Git branches, releases, and deployment
+
+The `develop` branch contains our working version, the `main` branch contains the "current" version of the app.
+
+When you start working on a new feature or bugfix, create a new branch. Start the branch name with `feature/` or `bugfix/`. When the feature is done, create a pull request to merge the changes into the `develop` branch.
+
+Publishing a new version of the app usually means the following:
+- Create a new release in Github. In the repository, select "create a new release". Create a new tag based on `develop` (see below). The name of a release tag should be the version number, e.g. `v0.1.2`. Add a description that describes the changes.
+- Merge the `develop` branch into the `main` branch.
+- Wait for the new version to go online. This happens automatically when commits are pushed to the `main` branch, through the [deploy workflow](.github/workflows/deploy.yml).
+
+Should you need to roll back to a previous version, you can create a commit to revert the changes on the `main` branch.
