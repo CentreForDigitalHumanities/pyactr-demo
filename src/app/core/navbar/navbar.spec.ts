@@ -1,9 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { Navbar } from './navbar';
-import { SharedTestingModule } from '../../shared/shared-module';
 import { provideRouter } from '@angular/router';
 import { routes } from '../../app.routes';
+import { TEST_PROVIDERS } from '../../shared/test-providers';
 
 describe('Navbar', () => {
     let component: Navbar;
@@ -11,8 +11,9 @@ describe('Navbar', () => {
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            imports: [SharedTestingModule, Navbar],
+            imports: [Navbar],
             providers: [
+                ...TEST_PROVIDERS,
                 provideRouter(routes)
             ]
         })

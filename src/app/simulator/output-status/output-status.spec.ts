@@ -1,9 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { OutputStatus } from './output-status';
-import { SharedTestingModule } from '../../shared/shared-module';
 import { Simulation } from '../simulation-manager';
 import { Python } from '../../shared/python';
+import { TEST_PROVIDERS } from '../../shared/test-providers';
 
 describe('OutputStatus', () => {
     let component: OutputStatus;
@@ -11,7 +11,8 @@ describe('OutputStatus', () => {
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            imports: [OutputStatus, SharedTestingModule]
+            providers: TEST_PROVIDERS,
+            imports: [OutputStatus]
         })
             .compileComponents();
 

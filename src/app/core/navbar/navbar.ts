@@ -1,11 +1,11 @@
 import { Component } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { NgbCollapse } from '@ng-bootstrap/ng-bootstrap';
-import { SharedModule } from '../../shared/shared-module';
+import { CommonModule } from '@angular/common';
 
 @Component({
     selector: '[app-navbar]',
-    imports: [SharedModule, RouterLink, RouterLinkActive, NgbCollapse],
+    imports: [CommonModule, RouterLink, RouterLinkActive, NgbCollapse],
     templateUrl: './navbar.html',
     styleUrl: './navbar.scss',
 })

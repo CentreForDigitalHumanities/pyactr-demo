@@ -1,9 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { Header } from './header';
-import { SharedTestingModule } from '../../shared/shared-module';
 import { provideRouter } from '@angular/router';
 import { routes } from '../../app.routes';
+import { TEST_PROVIDERS } from '../../shared/test-providers';
 
 describe('Header', () => {
     let component: Header;
@@ -11,8 +11,9 @@ describe('Header', () => {
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            imports: [SharedTestingModule, Header],
+            imports: [Header],
             providers: [
+                ...TEST_PROVIDERS,
                 provideRouter(routes),
             ]
         })

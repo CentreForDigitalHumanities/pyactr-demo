@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
-import { SharedModule } from '../shared/shared-module';
+import { CommonModule } from '@angular/common';
 
 @Component({
     selector: 'app-examples',
-    imports: [SharedModule],
+    imports: [CommonModule],
     templateUrl: './examples.html',
     styleUrl: './examples.scss',
 })

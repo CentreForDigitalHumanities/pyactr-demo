@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
-import { SharedModule } from '../../shared/shared-module';
 import { Navbar } from '../navbar/navbar';
+import { CommonModule } from '@angular/common';
 
 @Component({
     selector: '[app-header]',
-    imports: [SharedModule, Navbar],
+    imports: [CommonModule, Navbar],
     templateUrl: './header.html',
     styleUrl: './header.scss',
 })

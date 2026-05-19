@@ -1,10 +1,10 @@
 import { Component, input } from '@angular/core';
 import { Simulation } from '../simulation-manager';
-import { SharedModule } from '../../shared/shared-module';
+import { CommonModule } from '@angular/common';
 
 @Component({
     selector: 'app-output-status',
-    imports: [SharedModule],
+    imports: [CommonModule],
     templateUrl: './output-status.html',
 })
 export class OutputStatus {

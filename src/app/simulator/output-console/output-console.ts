@@ -1,11 +1,11 @@
 import { Component, input } from '@angular/core';
 import { ConsoleEvent } from '../simulation-manager';
-import { SharedModule } from '../../shared/shared-module';
+import { CommonModule } from '@angular/common';
 
 
 @Component({
   selector: 'app-output-console',
-  imports: [SharedModule],
+  imports: [CommonModule],
   templateUrl: './output-console.html',
   styleUrl: './output-console.scss',
 })

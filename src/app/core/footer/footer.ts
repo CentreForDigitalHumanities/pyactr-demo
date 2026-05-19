@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
 import { environment } from '../../../environments/environment';
-import { SharedModule } from '../../shared/shared-module';
+import { CommonModule } from '@angular/common';
 
 @Component({
     selector: '[app-footer]',
-    imports: [SharedModule],
+    imports: [CommonModule],
     templateUrl: './footer.html',
     styleUrl: './footer.scss',
 })

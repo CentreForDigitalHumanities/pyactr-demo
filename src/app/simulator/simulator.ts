@@ -1,9 +1,9 @@
 import { Component, inject } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { SimulationManager } from './simulation-manager';
-import { SharedModule } from '../shared/shared-module';
 import { OutputConsole } from './output-console/output-console';
 import { OutputStatus } from './output-status/output-status';
+import { CommonModule } from '@angular/common';
 
 
 const startingCode = `"""
@@ -93,7 +93,7 @@ if __name__ == "__main__":
 @Component({
     selector: 'app-simulator',
     imports: [
-        SharedModule,
+        CommonModule,
         ReactiveFormsModule,
         OutputConsole,
         OutputStatus,

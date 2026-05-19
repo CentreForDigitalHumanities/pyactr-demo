@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { Simulator } from './simulator';
-import { SharedTestingModule } from '../shared/shared-module';
+import { TEST_PROVIDERS } from '../shared/test-providers';
 
 describe('Simulator', () => {
     let component: Simulator;
@@ -9,7 +9,8 @@ describe('Simulator', () => {
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            imports: [SharedTestingModule, Simulator]
+            providers: TEST_PROVIDERS,
+            imports: [Simulator]
         })
             .compileComponents();
 

@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { OutputConsole } from './output-console';
-import { SharedTestingModule } from '../../shared/shared-module';
+import { TEST_PROVIDERS } from '../../shared/test-providers';
 
 describe('OutputConsole', () => {
     let component: OutputConsole;
@@ -8,7 +8,8 @@ describe('OutputConsole', () => {
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            imports: [OutputConsole, SharedTestingModule]
+            providers: TEST_PROVIDERS,
+            imports: [OutputConsole]
         })
             .compileComponents();
 

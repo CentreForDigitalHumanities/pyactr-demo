@@ -1,9 +1,9 @@
 import { TestBed } from '@angular/core/testing';
 
 import { Simulation, SimulationManager } from './simulation-manager';
-import { SharedTestingModule } from '../shared/shared-module';
 import { PythonMock } from '../shared/python-mock';
 import { Python } from '../shared/python';
+import { TEST_PROVIDERS } from '../shared/test-providers';
 
 const dummyScript = `print('Hello world!')\n`;
 
@@ -78,8 +78,7 @@ describe('SimulationManager', () => {
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            imports: [SharedTestingModule],
-            providers: [SimulationManager],
+            providers: [...TEST_PROVIDERS, SimulationManager],
         });
         python = TestBed.inject(Python);
         service = TestBed.inject(SimulationManager);
