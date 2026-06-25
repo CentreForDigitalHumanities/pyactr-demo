@@ -5,8 +5,10 @@ import { CommonModule } from '@angular/common';
     selector: 'app-examples',
     imports: [CommonModule],
     templateUrl: './examples.html',
-    styleUrl: './examples.scss',
+    styleUrl: './examples.scss'
 })
 export class Examples {
+    examplescripts = [{name : "addition", filename : "u1_addition.py"}];
+    
 
 }

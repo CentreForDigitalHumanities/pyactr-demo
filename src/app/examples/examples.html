@@ -1,5 +1,8 @@
 <div class="container px-5 py-5">
-    <p>
-        Coming soon!
-    </p>
+    <ul>
+        @for (example of examplescripts; track example.name){
+            <li>{{example.name}}</li>
+        }
+        
+    </ul>
 </div>
