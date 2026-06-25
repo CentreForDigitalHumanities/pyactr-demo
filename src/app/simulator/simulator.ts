@@ -4,6 +4,7 @@ import { SimulationManager } from './simulation-manager';
 import { OutputConsole } from './output-console/output-console';
 import { OutputStatus } from './output-status/output-status';
 import { CommonModule } from '@angular/common';
+import { ActivatedRoute } from '@angular/router';
 
 
 const startingCode = `"""
@@ -111,8 +112,16 @@ export class Simulator {
 
     simulationManager = inject(SimulationManager);
 
+    private activatedRoute = inject(ActivatedRoute);
+    example:string | null;
+
     onSubmit() {
         const code = this.form.controls.code.value || '';
         this.simulationManager.run(code);
+    }
+
+    constructor() {
+        this.example = this.activatedRoute.snapshot.paramMap.get('example_name');
+        console.log(this.example);
     }
 }

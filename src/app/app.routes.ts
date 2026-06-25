@@ -9,6 +9,10 @@ export const routes: Routes = [
         component: Simulator,
     },
     {
+        path: 'run/:example_name',
+        component: Simulator,
+    },
+    {
         path: 'examples',
         component: Examples,
     },
