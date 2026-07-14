@@ -5,6 +5,8 @@ import { OutputConsole } from './output-console/output-console';
 import { OutputStatus } from './output-status/output-status';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
+import { exampleScripts } from '../shared/examplelist';
+import { HttpClient } from '@angular/common/http';
 
 
 @Component({
@@ -29,6 +31,9 @@ export class Simulator {
     simulationManager = inject(SimulationManager);
 
     private activatedRoute = inject(ActivatedRoute);
+
+    private http = inject(HttpClient);
+
     example:string | null;
 
     onSubmit() {
@@ -38,6 +43,15 @@ export class Simulator {
 
     constructor() {
         this.example = this.activatedRoute.snapshot.paramMap.get('example_name');
-        console.log(this.example);
+        if (this.example){
+            let exampleScript = exampleScripts.find(example => example.name == this.example);
+            if (exampleScript){
+                const url = "/examplescripts/" + exampleScript.filename;
+                this.http.get(url, {responseType: "text"}).subscribe((text) => 
+                    this.form.controls.code.setValue(text));
+            }
+        }
+
     }
+
 }

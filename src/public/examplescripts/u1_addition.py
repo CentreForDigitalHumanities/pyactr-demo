@@ -76,6 +76,5 @@ addition.productionstring(name="increment_sum", string="""
         isa     countOrder
         first   =count""")
 
-if __name__ == "__main__":
-    x = addition.simulation()
-    x.run()
+x = addition.simulation(gui = False)
+x.run()
