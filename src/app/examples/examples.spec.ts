@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { CommonModule } from '@angular/common';
+import { RouterLink } from "@angular/router";
 import { Examples } from './examples';
 import { TEST_PROVIDERS } from '../shared/test-providers';
 
@@ -10,7 +11,7 @@ describe('Examples', () => {
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             providers: TEST_PROVIDERS,
-            imports: [Examples]
+            imports: [Examples, CommonModule, RouterLink]
         })
             .compileComponents();
 
