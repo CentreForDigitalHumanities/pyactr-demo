@@ -48,6 +48,11 @@ $ yarn start
 
 Once this is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload when you modify the source code.
 
+## Working on PyACT-R example scripts
+
+To edit PyACT-R example scripts, go to folder `src/public/examplescripts`.
+To edit the title that is shown on the `Examples` page, go to `src/app/shared/examplelist.ts`.
+
 ### Commands for common tasks
 
 Install the pinned package versions:
