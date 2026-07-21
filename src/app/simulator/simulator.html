@@ -8,8 +8,27 @@
                     <textarea class="form-control font-monospace text-nowrap overflow-x-scroll" rows="24"
                         [formControl]="form.controls.code"></textarea>
                 </div>
-                <div class="my-3">
-                    <button class="btn btn-success" type="submit">Run</button>
+                <div class="d-flex justify-content-end gap-2 my-3">
+                    <button 
+                        class="btn btn-light" 
+                        type="button" 
+                        title="Copy code to clipboard" 
+                        (click)="copyToClipboard()">
+                        Copy
+                    </button>
+                    <button 
+                        class="btn btn-light" 
+                        type="button" 
+                        title="Save code as a Python file" 
+                        (click)="downloadAsPythonFile()">
+                        Download
+                    </button>
+                    <button 
+                        class="btn btn-success" 
+                        type="submit" 
+                        title="Run simulation">
+                        Run
+                    </button>
                 </div>
             </form>
         </div>

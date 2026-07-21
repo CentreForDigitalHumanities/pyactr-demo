@@ -23,6 +23,7 @@ import { HttpClient } from '@angular/common/http';
     templateUrl: './simulator.html',
     styleUrl: './simulator.scss',
 })
+
 export class Simulator {
     form = new FormGroup({
         code: new FormControl<string>("", { nonNullable: true }),
@@ -33,6 +34,25 @@ export class Simulator {
     private activatedRoute = inject(ActivatedRoute);
 
     private http = inject(HttpClient);
+
+    copyToClipboard() {
+        navigator.clipboard.writeText(this.form.controls.code.value ?? '');
+    }
+
+    downloadAsPythonFile() {
+        const text = this.form.controls.code.value ?? '';
+
+        const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+
+        // Create an <a> element to trigger the download feature
+        const a = document.createElement('a');
+        a.href = url; // The link refers to the generated URL for the blob
+        a.download = 'code.py';
+        a.click(); // Simulate a user clicking the link
+
+        URL.revokeObjectURL(url);
+    }
 
     example:string | null;
 
