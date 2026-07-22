@@ -12,6 +12,7 @@ type PyodideAPI = {
     setStdin: (options?: any) => any;
     setStdout: (options?: any) => any;
     setStderr: (options?: any) => any;
+    setInterruptBuffer: (buffer: any) => any;
 };
 
 declare var loadPyodide: (options: any) => Promise<PyodideAPI>;
@@ -38,14 +39,18 @@ const initialImport = (pyodide: PyodideAPI) => {
 }
 
 class PythonRunner {
+    
     constructor(
         public id: number,
         public script: string,
+        public interruptBuffer: Uint8Array,
+        
     ) { }
 
     async run() {
         this.post('loading');
         const pyodide = await loadPythonAndPackages();
+        pyodide.setInterruptBuffer(this.interruptBuffer);
         initialImport(pyodide);
         this.post('starting');
         pyodide.setStdout({
@@ -55,7 +60,7 @@ class PythonRunner {
             batched: this.handleStdErr.bind(this),
         });
         try {
-            await pyodide.runPythonAsync(this.script);
+            pyodide.runPythonAsync(this.script);
             this.post('complete');
         } catch (err) {
             this.post('error', err);
@@ -83,7 +88,13 @@ class PythonRunner {
 
 }
 
+let runner: PythonRunner;
+
 addEventListener('message', async ({ data }: { data: PageMessage}) => {
-    const runner = new PythonRunner(data.id, data.script);
-    runner.run();
+    if (data.type === 'start'){
+        runner = new PythonRunner(data.id, data.script, data.interruptBuffer);
+        runner.run();
+    }
+    
+    
 });

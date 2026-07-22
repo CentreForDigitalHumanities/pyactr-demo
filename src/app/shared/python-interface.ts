@@ -6,6 +6,9 @@ export interface PageMessage {
     id: number;
     /** python script */
     script: string;
+
+    interruptBuffer: Uint8Array
+    type: 'start'
 }
 
 export type WorkerMessageStatus =

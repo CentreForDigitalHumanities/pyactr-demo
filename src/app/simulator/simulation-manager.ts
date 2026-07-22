@@ -16,6 +16,7 @@ export class Simulation {
     loading = signal<boolean>(false);
     console = signal<ConsoleEvent[]>([]);
     finished$ = new BehaviorSubject<boolean>(false);
+    interruptBuffer = new Uint8Array(new SharedArrayBuffer(1));
 
     private interrupt$ = new Subject<void>();
 
@@ -26,6 +27,7 @@ export class Simulation {
 
     /** Run simulation code */
     start() {
+        console.log("RUNNING");
         const stopListening$ = merge(
             this.interrupt$,
             this.finished$.pipe(filter(value => value)),
@@ -36,7 +38,7 @@ export class Simulation {
         ).subscribe(data => this.onWorkerMessage(data));
 
         this.loading.set(true);
-        this.python.postMessage({ id: this.id, script: this.code });
+        this.python.postMessage({ id: this.id, script: this.code, interruptBuffer: this.interruptBuffer, type: 'start'});
     }
 
     /** Stop simulation. The simulation will stop listening to the Python worker.
@@ -44,9 +46,12 @@ export class Simulation {
      */
     stop() {
         if (!this.interrupt$.closed) {
+            console.log("STOPPING");
+            this.interruptBuffer[0] = 2;
             this.interrupt$.next();
             this.interrupt$.complete();
             this.finished$.complete();
+            
         }
     }
 
@@ -89,5 +94,9 @@ export class SimulationManager {
         const simulation = new Simulation(this.python, code);
         this.current$.next(simulation);
         simulation.start();
+    }
+
+    runStop(){
+        this.current$.value?.stop();
     }
 }

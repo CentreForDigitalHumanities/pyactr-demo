@@ -54,12 +54,17 @@ export class Simulator {
         URL.revokeObjectURL(url);
     }
 
-    example:string | null;
-
-    onSubmit() {
-        const code = this.form.controls.code.value || '';
-        this.simulationManager.run(code);
+    onSubmit(id: 'run' | 'stop') {
+        if(id === "run"){
+            const code = this.form.controls.code.value || '';
+            this.simulationManager.run(code);
+        }
+        else if(id === "stop"){
+            this.simulationManager.runStop();
+        }
     }
+
+    example:string | null;
 
     constructor() {
         this.example = this.activatedRoute.snapshot.paramMap.get('example_name');
