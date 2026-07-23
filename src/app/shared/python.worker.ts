@@ -57,8 +57,10 @@ class PythonRunner {
             batched: this.handleStdErr.bind(this),
         });
         try {
-            pyodide.runPythonAsync(this.script);
-            this.post('complete');
+            pyodide.runPythonAsync(this.script).then(() => {
+
+                this.post('complete');
+            });
         } catch (err) {
             this.post('error', err);
         }

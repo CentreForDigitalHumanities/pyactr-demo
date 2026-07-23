@@ -31,8 +31,9 @@ export class Python {
     stop() {
         this.worker.terminate();
         this.worker = new Worker(
-        new URL('./python.worker', import.meta.url), { type: 'classic' }
-    );
+            new URL('./python.worker', import.meta.url), { type: 'classic' }
+        );
+        this.worker.onmessage = ({data}) => this.onWorkerMessage(data);
     }
 
 }
