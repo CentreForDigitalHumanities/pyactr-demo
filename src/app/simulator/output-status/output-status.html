@@ -3,11 +3,15 @@
         @if (simulation.loading()) {
             <div class="spinner-border spinner-border-sm me-1" aria-hidden></div>
             Importing libraries
-        } @else if (!(simulation.finished$ | async)) {
+        } @else if ((simulation.status$ | async) == "complete") {
+            Finished!
+        } @else if ((simulation.status$ | async) == "error") {
+            There was an error when running the simulation.
+        } @else if ((simulation.status$ | async) == "interrupt") {
+            Simulation is interrupted
+        } @else if ((simulation.status$ | async) == "running") {
             <div class="spinner-border spinner-border-sm me-1" aria-hidden></div>
             Running code...
-        } @else {
-            Finished!
         }
     }
 </div>

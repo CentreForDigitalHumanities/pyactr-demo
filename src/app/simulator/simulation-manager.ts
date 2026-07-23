@@ -5,6 +5,8 @@ import { WorkerMessage } from '../shared/python-interface';
 
 let nextID = 0;
 
+export type ScriptStatus = "complete" | "error" | "interrupt" | "running" | "idle";
+
 export interface ConsoleEvent {
     type: 'out' | 'err';
     value: string;
@@ -15,8 +17,8 @@ export class Simulation {
 
     loading = signal<boolean>(false);
     console = signal<ConsoleEvent[]>([]);
-    finished$ = new BehaviorSubject<boolean>(false);
-
+    status$ = new BehaviorSubject<ScriptStatus>("idle");
+    
     private interrupt$ = new Subject<void>();
 
     constructor(
@@ -26,9 +28,10 @@ export class Simulation {
 
     /** Run simulation code */
     start() {
+        this.status$.next('running');
         const stopListening$ = merge(
             this.interrupt$,
-            this.finished$.pipe(filter(value => value)),
+            this.status$.pipe(filter(value => value == 'complete' || value == 'error' || value == 'interrupt')),
         );
         this.python.workerMessage$.pipe(
             takeUntil(stopListening$),
@@ -36,7 +39,7 @@ export class Simulation {
         ).subscribe(data => this.onWorkerMessage(data));
 
         this.loading.set(true);
-        this.python.postMessage({ id: this.id, script: this.code });
+        this.python.postMessage({ id: this.id, script: this.code, type: 'start'});
     }
 
     /** Stop simulation. The simulation will stop listening to the Python worker.
@@ -44,9 +47,12 @@ export class Simulation {
      */
     stop() {
         if (!this.interrupt$.closed) {
+            this.python.stop();
+            this.status$.next("interrupt");
             this.interrupt$.next();
             this.interrupt$.complete();
-            this.finished$.complete();
+            this.status$.complete();
+            this.loading.set(false);
         }
     }
 
@@ -65,14 +71,14 @@ export class Simulation {
             );
         }
         if (data.status == 'complete') {
-            this.finished$.next(true);
+            this.status$.next("complete");
         }
         if (data.status == 'error') {
             const err = data.value as Error;
             this.console.update((value) =>
                 [...value, { type: 'err' , value: err.message }]
             );
-            this.finished$.next(true);
+            this.status$.next("error");
         }
     }
 }
@@ -89,5 +95,9 @@ export class SimulationManager {
         const simulation = new Simulation(this.python, code);
         this.current$.next(simulation);
         simulation.start();
+    }
+
+    runStop(){
+        this.current$.value?.stop();
     }
 }

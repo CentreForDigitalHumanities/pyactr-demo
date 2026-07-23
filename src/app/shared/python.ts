@@ -27,4 +27,13 @@ export class Python {
     private onWorkerMessage(data: any): void {
         this.workerMessage$.next(data);
     }
+
+    stop() {
+        this.worker.terminate();
+        this.worker = new Worker(
+            new URL('./python.worker', import.meta.url), { type: 'classic' }
+        );
+        this.worker.onmessage = ({data}) => this.onWorkerMessage(data);
+    }
+
 }
