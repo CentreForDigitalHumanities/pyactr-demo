@@ -7,7 +7,6 @@ export interface PageMessage {
     /** python script */
     script: string;
 
-    interruptBuffer: Uint8Array
     type: 'start'
 }
 

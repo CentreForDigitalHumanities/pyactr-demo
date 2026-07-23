@@ -43,14 +43,11 @@ class PythonRunner {
     constructor(
         public id: number,
         public script: string,
-        public interruptBuffer: Uint8Array,
-        
     ) { }
 
     async run() {
         this.post('loading');
         const pyodide = await loadPythonAndPackages();
-        pyodide.setInterruptBuffer(this.interruptBuffer);
         initialImport(pyodide);
         this.post('starting');
         pyodide.setStdout({
@@ -92,7 +89,7 @@ let runner: PythonRunner;
 
 addEventListener('message', async ({ data }: { data: PageMessage}) => {
     if (data.type === 'start'){
-        runner = new PythonRunner(data.id, data.script, data.interruptBuffer);
+        runner = new PythonRunner(data.id, data.script);
         runner.run();
     }
     
