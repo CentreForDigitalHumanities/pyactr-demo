@@ -4,31 +4,53 @@
             <h2>Model</h2>
             <form [formGroup]="form" (submit)="onSubmit()">
                 <div class="my-3">
-                    <label class="form-label" for="input-code">Simulation code</label>
-                    <textarea class="form-control font-monospace text-nowrap overflow-x-scroll" rows="24"
-                        [formControl]="form.controls.code"></textarea>
-                </div>
-                <div class="d-flex justify-content-end gap-2 my-3">
-                    <button 
-                        class="btn btn-light" 
-                        type="button" 
-                        title="Copy code to clipboard" 
-                        (click)="copyToClipboard()">
-                        Copy
-                    </button>
-                    <button 
-                        class="btn btn-light" 
-                        type="button" 
-                        title="Save code as a Python file" 
-                        (click)="downloadAsPythonFile()">
-                        Download
-                    </button>
-                    <button 
-                        class="btn btn-success" 
-                        type="submit" 
-                        title="Run simulation">
-                        Run
-                    </button>
+                    <label class="form-label col-form-label-lg" for="input-code">Simulation code</label>
+                    <div class="d-flex align-items-center justify-content-between gap-4 my-3">
+                        <div class="d-flex gap-2">
+                            <button 
+                                class="btn btn-light" 
+                                type="button" 
+                                title="Copy code to clipboard" 
+                                (click)="copyToClipboard()">
+                                Copy
+                            </button>
+                            <button 
+                                class="btn btn-light" 
+                                type="button" 
+                                title="Save code as a Python file" 
+                                (click)="downloadAsPythonFile()">
+                                Download
+                            </button>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" role="switch" id="switchTabIndent" (change)="onCheckedTabIndent($event)" checked>
+                                <label class="form-check-label" for="switchTabIndent">Indent with Tab</label>
+                            </div>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" role="switch" id="switchDarkTheme" (change)="onCheckedDarkTheme($event)">
+                                <label class="form-check-label" for="switchDarkTheme">Dark Theme</label>
+                            </div>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button 
+                                class="btn btn-success" 
+                                type="submit" 
+                                title="Run simulation">
+                                Run
+                            </button>
+                        </div>
+                    </div>
+                    <code-editor 
+                        id="input-code"
+                        class="form-control font-monospace text-nowrap overflow-x-scroll" 
+                        rows="24" 
+                        [formControl]="form.controls.code" 
+                        [languages]="languages" 
+                        language="Python"
+                        [indentWithTab]="indentWithTab()"
+                        [theme]="theme()"
+                    />
                 </div>
             </form>
         </div>
