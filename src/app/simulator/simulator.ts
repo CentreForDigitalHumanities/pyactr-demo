@@ -1,5 +1,5 @@
-import { Component, inject } from '@angular/core';
-import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { Component, inject, signal } from '@angular/core';
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { SimulationManager } from './simulation-manager';
 import { OutputConsole } from './output-console/output-console';
 import { OutputStatus } from './output-status/output-status';
@@ -7,6 +7,10 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { exampleScripts } from '../shared/examplelist';
 import { HttpClient } from '@angular/common/http';
+import { CodeEditor, Theme } from '@acrodata/code-editor';
+import { Python } from '../shared/python';
+import { elementAt } from 'rxjs';
+import { languages } from '@codemirror/language-data';
 
 
 @Component({
@@ -16,6 +20,8 @@ import { HttpClient } from '@angular/common/http';
         ReactiveFormsModule,
         OutputConsole,
         OutputStatus,
+        FormsModule,
+        CodeEditor,
     ],
     providers: [
         SimulationManager
@@ -29,11 +35,37 @@ export class Simulator {
         code: new FormControl<string>("", { nonNullable: true }),
     });
 
+    languages = languages;
+
     simulationManager = inject(SimulationManager);
 
     private activatedRoute = inject(ActivatedRoute);
 
     private http = inject(HttpClient);
+
+    theme = signal<Theme>("light");
+    indentWithTab = signal<boolean>(true);
+    
+    onCheckedDarkTheme(event: Event){
+        const checkedTheme = (event.target as HTMLInputElement).checked;
+        if (checkedTheme){
+            this.theme.set("dark");
+        }
+        else {
+            this.theme.set("light");
+        }
+    }
+
+    onCheckedTabIndent(event: Event){
+        const checkedTab = (event.target as HTMLInputElement).checked;
+        if (checkedTab){
+            this.indentWithTab.set(true);
+        }
+        else {
+            this.indentWithTab.set(false);
+        }
+    }
+
 
     copyToClipboard() {
         navigator.clipboard.writeText(this.form.controls.code.value ?? '');
