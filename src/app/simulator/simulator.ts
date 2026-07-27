@@ -45,7 +45,7 @@ export class Simulator {
 
     theme = signal<Theme>("light");
     indentWithTab = signal<boolean>(true);
-    
+
     onCheckedDarkTheme(event: Event){
         const checkedTheme = (event.target as HTMLInputElement).checked;
         if (checkedTheme){
@@ -103,8 +103,8 @@ export class Simulator {
         if (this.example){
             let exampleScript = exampleScripts.find(example => example.name == this.example);
             if (exampleScript){
-                const url = "/examplescripts/" + exampleScript.filename;
-                this.http.get(url, {responseType: "text"}).subscribe((text) => 
+                const url = "examplescripts/" + exampleScript.filename;
+                this.http.get(url, {responseType: "text"}).subscribe((text) =>
                     this.form.controls.code.setValue(text));
             }
         }
