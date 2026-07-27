@@ -5,11 +5,9 @@ import { OutputConsole } from './output-console/output-console';
 import { OutputStatus } from './output-status/output-status';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
-import { exampleScripts } from '../shared/examplelist';
+import { exampleScripts, getExample } from '../shared/examplelist';
 import { HttpClient } from '@angular/common/http';
 import { CodeEditor, Theme } from '@acrodata/code-editor';
-import { Python } from '../shared/python';
-import { elementAt } from 'rxjs';
 import { languages } from '@codemirror/language-data';
 
 
@@ -101,7 +99,7 @@ export class Simulator {
     constructor() {
         this.example = this.activatedRoute.snapshot.paramMap.get('example_name');
         if (this.example){
-            let exampleScript = exampleScripts.find(example => example.name == this.example);
+            let exampleScript = getExample(exampleScripts, this.example);
             if (exampleScript){
                 const url = "examplescripts/" + exampleScript.filename;
                 this.http.get(url, {responseType: "text"}).subscribe((text) =>
