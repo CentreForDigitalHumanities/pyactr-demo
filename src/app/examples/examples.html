@@ -5,8 +5,7 @@
     </p>
     <ul>
         @for (example of exampleScripts; track example.name){
-            <li><a routerLink="/run/{{example.name}}">{{example.name}}</a></li>
+            <li><a [routerLink]="['/run', exampleID(example)]">{{example.name}}</a></li>
         }
-        
-    </ul>    
+    </ul>
 </div>
