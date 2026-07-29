@@ -1,4 +1,4 @@
-import { inject, Injectable, signal } from '@angular/core';
+import { inject, Injectable, signal, WritableSignal } from '@angular/core';
 import { BehaviorSubject, filter, merge, Subject, takeUntil } from 'rxjs';
 import { Python } from '../shared/python';
 import { WorkerMessage } from '../shared/python-interface';
@@ -17,11 +17,13 @@ export class Simulation {
     id = nextID++;
 
     loading = signal<boolean>(false);
-    console = signal<ConsoleEvent[]>([]);
+    scriptConsole = signal<ConsoleEvent[]>([]);
+    simulationConsole = signal<ConsoleEvent[]>([]);
     status$ = new BehaviorSubject<SimulationStatus>('idle');
     stepperAvailable = signal<boolean>(false);
 
     private interrupt$ = new Subject<void>();
+    private currentConsole = signal<WritableSignal<ConsoleEvent[]>>(this.scriptConsole);
 
     constructor(
         private python: Python,
@@ -71,18 +73,19 @@ export class Simulation {
             this.loading.set(false);
         }
         if (data.status == 'stdout') {
-            this.console.update((value) =>
+            this.currentConsole().update((value) =>
                 [...value, { type: 'out', value: data.value }]
             );
         }
         if (data.status == 'stderr') {
-            this.console.update((value) =>
+            this.currentConsole().update((value) =>
                 [...value, { type: 'err', value: data.value }]
             );
         }
         if (data.status == 'complete') {
             if (data.value) {
                 this.status$.next('stepper');
+                this.currentConsole.set(this.simulationConsole);
                 this.stepperAvailable.set(true);
             } else {
                 this.status$.next('complete');
@@ -90,7 +93,7 @@ export class Simulation {
         }
         if (data.status == 'error') {
             const err = data.value as Error;
-            this.console.update((value) =>
+            this.currentConsole().update((value) =>
                 [...value, { type: 'err' , value: err.message }]
             );
             this.status$.next('error');
