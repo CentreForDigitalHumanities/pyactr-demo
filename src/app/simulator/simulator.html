@@ -65,17 +65,28 @@
         <div class="col-lg-6">
             <h2 class="mb-3">Output</h2>
 
-            <app-output-status [simulation]="simulationManager.current$ | async" />
-
             @if (simulationManager.current$ | async; as simulation) {
-                @if (simulation.stepperAvailable()) {
-                    <div class="my-3">
-                        <app-stepper [simulation]="simulation" />
+                <div class="card">
+                    <div class="card-header">
+                        <app-output-status [simulation]="simulation" />
                     </div>
-                }
-
-                <div class="my-3">
-                    <app-output-console [console]="simulation.console()" />
+                    <div class="list-group list-group-flush">
+                        @if (simulation.scriptConsole().length) {
+                            <div class="list-group-item">
+                                <h3 class="fs-5">Script output</h3>
+                                <app-output-console [console]="simulation.scriptConsole()" />
+                            </div>
+                        }
+                        @if (simulation.stepperAvailable()) {
+                            <div class="list-group-item">
+                                <h3 class="fs-5">Simulation</h3>
+                                <div class="my-3">
+                                    <app-stepper [simulation]="simulation" />
+                                </div>
+                                <app-output-console [console]="simulation.simulationConsole()" />
+                            </div>
+                        }
+                    </div>
                 </div>
             }
         </div>
