@@ -5,7 +5,8 @@ import { WorkerMessage } from '../shared/python-interface';
 
 let nextID = 0;
 
-export type ScriptStatus = "complete" | "error" | "interrupt" | "running" | "idle";
+export type SimulationStatus =
+    'idle' | 'loading' | 'running' | 'stepper' | 'complete' | 'interrupt' | 'error';
 
 export interface ConsoleEvent {
     type: 'out' | 'err';
@@ -17,7 +18,7 @@ export class Simulation {
 
     loading = signal<boolean>(false);
     console = signal<ConsoleEvent[]>([]);
-    status$ = new BehaviorSubject<ScriptStatus>("idle");
+    status$ = new BehaviorSubject<SimulationStatus>('idle');
     stepperAvailable = signal<boolean>(false);
 
     private interrupt$ = new Subject<void>();
@@ -49,7 +50,7 @@ export class Simulation {
     stop() {
         if (!this.interrupt$.closed) {
             this.python.stop();
-            this.status$.next("interrupt");
+            this.status$.next('interrupt');
             this.interrupt$.next();
             this.interrupt$.complete();
             this.status$.complete();
@@ -80,15 +81,19 @@ export class Simulation {
             );
         }
         if (data.status == 'complete') {
-            this.status$.next("complete");
-            this.stepperAvailable.set(!!data.value);
+            if (data.value) {
+                this.status$.next('stepper');
+                this.stepperAvailable.set(true);
+            } else {
+                this.status$.next('complete');
+            }
         }
         if (data.status == 'error') {
             const err = data.value as Error;
             this.console.update((value) =>
                 [...value, { type: 'err' , value: err.message }]
             );
-            this.status$.next("error");
+            this.status$.next('error');
         }
     }
 }

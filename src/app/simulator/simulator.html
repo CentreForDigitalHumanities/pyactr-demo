@@ -68,17 +68,16 @@
             <app-output-status [simulation]="simulationManager.current$ | async" />
 
             @if (simulationManager.current$ | async; as simulation) {
-                <div class="my-3">
-                    <app-output-console [console]="simulation.console()" />
-                </div>
-
                 @if (simulation.stepperAvailable()) {
                     <div class="my-3">
                         <app-stepper [simulation]="simulation" />
                     </div>
                 }
-            }
 
+                <div class="my-3">
+                    <app-output-console [console]="simulation.console()" />
+                </div>
+            }
         </div>
     </div>
 </div>
