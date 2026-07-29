@@ -57,6 +57,14 @@ export class Simulation {
         }
     }
 
+    step() {
+        this.python.postMessage({ id: this.id, type: 'step' });
+    }
+
+    run() {
+        this.python.postMessage({ id: this.id, type: 'run' });
+    }
+
     private onWorkerMessage(data: WorkerMessage) {
         if (data.status == 'starting') {
             this.loading.set(false);

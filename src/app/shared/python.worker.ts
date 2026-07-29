@@ -1,5 +1,6 @@
 /// <reference lib="webworker" />
 
+import { ACTRModel, ACTRSimulation } from "./actr-types";
 import { type WorkerMessageStatus, type WorkerMessage, type PageMessage } from "./python-interface";
 
 importScripts('https://cdn.jsdelivr.net/pyodide/v0.29.1/full/pyodide.js');
@@ -30,17 +31,14 @@ const importPyactrSnippet = `
 import pyactr as actr
 `;
 
-const modelCheckSnippet = `
-from pyactr import ACTRModel
-def is_model(value):
-    return isinstance(value, ACTRModel)
-is_model
-`;
-
 /** whether  */
 const isACTRModel = (pyodide: PyodideAPI, value: any): boolean => {
     if (value) {
-        const modelCheck = pyodide.runPython(modelCheckSnippet);
+        const modelCheck = pyodide.runPython(`
+from pyactr import ACTRModel
+def is_model(value):
+    return isinstance(value, ACTRModel)
+is_model`);
         return modelCheck(value);
     }
     return false;
@@ -57,7 +55,8 @@ const initialImport = (pyodide: PyodideAPI) => {
 
 class PythonRunner {
     pyodide: Promise<PyodideAPI>;
-    model?: any;
+    model?: ACTRModel;
+    simulation?: ACTRSimulation;
 
     constructor(
         public id: number,
@@ -66,7 +65,7 @@ class PythonRunner {
         this.pyodide = loadPythonAndPackages();
     }
 
-    async run() {
+    async runScript() {
         this.post('loading');
         const pyodide = await this.pyodide;
         initialImport(pyodide);
@@ -81,13 +80,35 @@ class PythonRunner {
             pyodide.runPythonAsync(this.script).then((result) => {
                 const hasModel = isACTRModel(pyodide, result);
                 if (hasModel) {
-                    this.model = result;
+                    this.model = result as ACTRModel;
                 }
                 this.post('complete', hasModel);
             });
         } catch (err) {
             this.post('error', err);
         }
+    }
+
+    stepSimulation() {
+        if (this.model) {
+            if (!this.simulation) {
+                this.simulation = this.newSimulation(this.model);
+            }
+            this.simulation.step();
+        }
+    }
+
+    runSimulation() {
+        if (this.model) {
+            if (!this.simulation) {
+                this.simulation = this.newSimulation(this.model);
+            }
+            this.simulation.run();
+        }
+    }
+
+    private newSimulation(model: ACTRModel): ACTRSimulation {
+        return model.simulation.callKwargs({gui: false});
     }
 
     private post(status: WorkerMessageStatus, data?: any) {
@@ -114,10 +135,16 @@ class PythonRunner {
 let runner: PythonRunner;
 
 addEventListener('message', async ({ data }: { data: PageMessage}) => {
-    if (data.type === 'start'){
+    if (data.type === 'start') {
         runner = new PythonRunner(data.id, data.script);
-        runner.run();
+        runner.runScript();
     }
 
+    if (data.type == 'step') {
+        runner?.stepSimulation();
+    }
 
+    if (data.type == 'run') {
+        runner?.runSimulation();
+    }
 });

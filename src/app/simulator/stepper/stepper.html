@@ -1,1 +1,8 @@
-<p>stepper works!</p>
+<div class="hstack">
+    <button class="btn btn-primary me-2" (click)="simulation().step()">
+        Step
+    </button>
+    <button class="btn btn-primary" (click)="simulation().run()">
+        Run all
+    </button>
+</div>
