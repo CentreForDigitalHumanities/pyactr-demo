@@ -30,6 +30,23 @@ const importPyactrSnippet = `
 import pyactr as actr
 `;
 
+const modelCheckSnippet = `
+from pyactr import ACTRModel
+def is_model(value):
+    return isinstance(value, ACTRModel)
+is_model
+`;
+
+/** whether  */
+const isACTRModel = (pyodide: PyodideAPI, value: any): boolean => {
+    if (value) {
+        const modelCheck = pyodide.runPython(modelCheckSnippet);
+        return modelCheck(value);
+    }
+    return false;
+}
+
+
 /** Run initial pyactr import.
  * This can be done before connecting the stdout/stderr output, so any warnings that
  * pop up here (e.g. DeprecationWarning) are not shown to the user.
@@ -39,15 +56,19 @@ const initialImport = (pyodide: PyodideAPI) => {
 }
 
 class PythonRunner {
-    
+    pyodide: Promise<PyodideAPI>;
+    model?: any;
+
     constructor(
         public id: number,
         public script: string,
-    ) { }
+    ) {
+        this.pyodide = loadPythonAndPackages();
+    }
 
     async run() {
         this.post('loading');
-        const pyodide = await loadPythonAndPackages();
+        const pyodide = await this.pyodide;
         initialImport(pyodide);
         this.post('starting');
         pyodide.setStdout({
@@ -57,9 +78,12 @@ class PythonRunner {
             batched: this.handleStdErr.bind(this),
         });
         try {
-            pyodide.runPythonAsync(this.script).then(() => {
-
-                this.post('complete');
+            pyodide.runPythonAsync(this.script).then((result) => {
+                const hasModel = isACTRModel(pyodide, result);
+                if (hasModel) {
+                    this.model = result;
+                }
+                this.post('complete', hasModel);
             });
         } catch (err) {
             this.post('error', err);
@@ -94,6 +118,6 @@ addEventListener('message', async ({ data }: { data: PageMessage}) => {
         runner = new PythonRunner(data.id, data.script);
         runner.run();
     }
-    
-    
+
+
 });

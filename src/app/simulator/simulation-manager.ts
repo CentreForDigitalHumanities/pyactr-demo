@@ -18,7 +18,8 @@ export class Simulation {
     loading = signal<boolean>(false);
     console = signal<ConsoleEvent[]>([]);
     status$ = new BehaviorSubject<ScriptStatus>("idle");
-    
+    stepperAvailable = signal<boolean>(false);
+
     private interrupt$ = new Subject<void>();
 
     constructor(
@@ -72,6 +73,7 @@ export class Simulation {
         }
         if (data.status == 'complete') {
             this.status$.next("complete");
+            this.stepperAvailable.set(!!data.value);
         }
         if (data.status == 'error') {
             const err = data.value as Error;
