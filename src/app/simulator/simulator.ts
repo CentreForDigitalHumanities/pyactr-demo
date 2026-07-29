@@ -9,6 +9,7 @@ import { exampleScripts, getExample } from '../shared/examplelist';
 import { HttpClient } from '@angular/common/http';
 import { CodeEditor, Theme } from '@acrodata/code-editor';
 import { languages } from '@codemirror/language-data';
+import { Stepper } from './stepper/stepper';
 
 
 @Component({
@@ -20,6 +21,7 @@ import { languages } from '@codemirror/language-data';
         OutputStatus,
         FormsModule,
         CodeEditor,
+        Stepper,
     ],
     providers: [
         SimulationManager
