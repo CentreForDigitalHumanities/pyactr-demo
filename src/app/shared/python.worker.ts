@@ -94,7 +94,11 @@ class PythonRunner {
             if (!this.simulation) {
                 this.simulation = this.newSimulation(this.model);
             }
-            this.simulation.step();
+            try {
+                this.simulation.step();
+            } catch (err) {
+                this.post('error', err);
+            }
         }
     }
 
@@ -103,7 +107,11 @@ class PythonRunner {
             if (!this.simulation) {
                 this.simulation = this.newSimulation(this.model);
             }
-            this.simulation.run();
+            try {
+                this.simulation.run();
+            } catch (err) {
+                this.post('error', err);
+            }
         }
     }
 
