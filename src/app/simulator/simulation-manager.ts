@@ -16,7 +16,6 @@ export interface ConsoleEvent {
 export class Simulation {
     id = nextID++;
 
-    loading = signal<boolean>(false);
     scriptConsole = signal<ConsoleEvent[]>([]);
     simulationConsole = signal<ConsoleEvent[]>([]);
     status$ = new BehaviorSubject<SimulationStatus>('idle');
@@ -32,7 +31,7 @@ export class Simulation {
 
     /** Run simulation code */
     start() {
-        this.status$.next('running');
+        this.status$.next('loading');
         const stopListening$ = merge(
             this.interrupt$,
             this.status$.pipe(filter(value => value == 'complete' || value == 'error' || value == 'interrupt')),
@@ -42,7 +41,6 @@ export class Simulation {
             filter(message => message.id == this.id), // only listen to this simulation
         ).subscribe(data => this.onWorkerMessage(data));
 
-        this.loading.set(true);
         this.python.postMessage({ id: this.id, script: this.code, type: 'start'});
     }
 
@@ -56,7 +54,6 @@ export class Simulation {
             this.interrupt$.next();
             this.interrupt$.complete();
             this.status$.complete();
-            this.loading.set(false);
         }
     }
 
@@ -70,7 +67,7 @@ export class Simulation {
 
     private onWorkerMessage(data: WorkerMessage) {
         if (data.status == 'starting') {
-            this.loading.set(false);
+            this.status$.next('running');
         }
         if (data.status == 'stdout') {
             this.currentConsole().update((value) =>
