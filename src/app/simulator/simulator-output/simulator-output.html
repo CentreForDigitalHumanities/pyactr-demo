@@ -1,46 +1,55 @@
-@let status = simulation().status$ | async;
 
 <div class="card">
-    <div class="list-group list-group-flush">
-        <div class="list-group-item">
-            <span role="status" >
-                @if (status == 'loading') {
-                    <div class="spinner-border spinner-border-sm" aria-hidden="true"></div>
-                    Loading pyactr...
-                } @else {
-                    Loaded pyactr
-                }
-            </span>
-        </div>
-        @if (status !== 'idle' && status !== 'loading') {
-            <div class="list-group-item">
-                <h3 class="fs-5">Script</h3>
-                <p role="status">
-                    @if (status === 'running') {
-                        <div class="spinner-border spinner-border-sm" aria-hidden="true"></div>
-                        Running script...
-                    } @else if (status === 'complete' || status == 'stepper') {
-                        Script complete
-                    } @else if (status === 'script_error') {
-                        There was an error while running the script
-                    } @else if (status == 'script_interrupt') {
-                        Script interrupted
-                    }
-                </p>
-
-                <div class="my-3">
-                    <app-output-console [console]="simulation().scriptConsole()" />
-                </div>
-            </div>
-        }
-        @if (status == 'stepper') {
-            <div class="list-group-item">
-                <h3 class="fs-5">Simulation</h3>
-                <div class="my-3">
-                    <app-stepper [simulation]="simulation()" />
-                </div>
-                <app-output-console [console]="simulation().simulationConsole()" />
-            </div>
-        }
+    <div class="card-header">
+        <h2 class="fs-4 mb-0">Output</h2>
     </div>
+    @if (simulation(); as simulation) {
+        @let status = simulation.status$ | async;
+        <div class="list-group list-group-flush">
+            <div class="list-group-item">
+                <span role="status" >
+                    @if (status == 'loading') {
+                        <div class="spinner-border spinner-border-sm" aria-hidden="true"></div>
+                        Loading pyactr...
+                    } @else {
+                        Loaded pyactr
+                    }
+                </span>
+            </div>
+            @if (status !== 'idle' && status !== 'loading') {
+                <div class="list-group-item">
+                    <h3 class="fs-5">Script</h3>
+                    <p role="status">
+                        @if (status === 'running') {
+                            <div class="spinner-border spinner-border-sm" aria-hidden="true"></div>
+                            Running script...
+                        } @else if (status === 'complete' || status == 'stepper') {
+                            Script complete
+                        } @else if (status === 'script_error') {
+                            There was an error while running the script
+                        } @else if (status == 'script_interrupt') {
+                            Script interrupted
+                        }
+                    </p>
+
+                    <div class="my-3">
+                        <app-output-console [console]="simulation.scriptConsole()" />
+                    </div>
+                </div>
+            }
+            @if (status == 'stepper') {
+                <div class="list-group-item">
+                    <h3 class="fs-5">Simulation</h3>
+                    <div class="my-3">
+                        <app-stepper [simulation]="simulation" />
+                    </div>
+                    <app-output-console [console]="simulation.simulationConsole()" />
+                </div>
+            }
+        </div>
+    } @else {
+        <div class="card-body">
+            Run a model script to start
+        </div>
+    }
 </div>

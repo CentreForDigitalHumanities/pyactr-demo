@@ -11,5 +11,5 @@ import { Stepper } from '../stepper/stepper';
     styleUrl: './simulator-output.scss',
 })
 export class SimulatorOutput {
-    simulation = input.required<Simulation>();
+    simulation = input<Simulation | null>();
 }
