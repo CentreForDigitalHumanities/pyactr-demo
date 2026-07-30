@@ -21,9 +21,9 @@
                         Running script...
                     } @else if (status === 'complete' || status == 'stepper') {
                         Script complete
-                    } @else if (status === 'error') {
+                    } @else if (status === 'script_error') {
                         There was an error while running the script
-                    } @else if (status == 'interrupt') {
+                    } @else if (status == 'script_interrupt') {
                         Script interrupted
                     }
                 </p>
@@ -33,7 +33,7 @@
                 </div>
             </div>
         }
-        @if (simulation().stepperAvailable()) {
+        @if (status == 'stepper') {
             <div class="list-group-item">
                 <h3 class="fs-5">Simulation</h3>
                 <div class="my-3">
