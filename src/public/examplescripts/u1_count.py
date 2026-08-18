@@ -79,7 +79,4 @@ counting.productionstring(name="stop", string="""
 #adding stuff to goal buffer
 counting.goal.add(actr.chunkstring(string="isa countFrom start 2 end 4"))
 
-
-x = counting.simulation(gui = False)
-x.run()
-
+counting

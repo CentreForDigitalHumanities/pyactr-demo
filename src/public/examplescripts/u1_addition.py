@@ -76,5 +76,4 @@ addition.productionstring(name="increment_sum", string="""
         isa     countOrder
         first   =count""")
 
-x = addition.simulation(gui = False)
-x.run()
+addition

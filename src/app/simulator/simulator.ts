@@ -1,14 +1,13 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { SimulationManager } from './simulation-manager';
-import { OutputConsole } from './output-console/output-console';
-import { OutputStatus } from './output-status/output-status';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { exampleScripts, getExample } from '../shared/examplelist';
 import { HttpClient } from '@angular/common/http';
 import { CodeEditor, Theme } from '@acrodata/code-editor';
 import { languages } from '@codemirror/language-data';
+import { SimulatorOutput } from "./simulator-output/simulator-output";
 
 
 @Component({
@@ -16,10 +15,9 @@ import { languages } from '@codemirror/language-data';
     imports: [
         CommonModule,
         ReactiveFormsModule,
-        OutputConsole,
-        OutputStatus,
         FormsModule,
         CodeEditor,
+        SimulatorOutput
     ],
     providers: [
         SimulationManager

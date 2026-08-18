@@ -39,7 +39,7 @@ describe('Simulation', () => {
             status: 'stderr',
             value: 'c'
         });
-        expect(simulation.console()).toEqual([
+        expect(simulation.scriptConsole()).toEqual([
             { type: 'out', value: 'a' },
             { type: 'out', value: 'b' },
             { type: 'err', value: 'c' }
@@ -66,9 +66,35 @@ describe('Simulation', () => {
             value: 'b'
         });
         // Second message should not be received.
-        expect(simulation.console()).toEqual([
+        expect(simulation.scriptConsole()).toEqual([
             { type: 'out', value: 'a' },
         ]);
+    });
+
+    it('splits script output and simulation output', () => {
+        simulation.start();
+        python.workerMessage$.next({
+            id: simulation.id,
+            status: 'stdout',
+            value: 'a'
+        });
+        python.workerMessage$.next({
+            id: simulation.id,
+            status: 'complete',
+            value: true,
+        });
+        python.workerMessage$.next({
+            id: simulation.id,
+            status: 'stdout',
+            value: 'b'
+        });
+        expect(simulation.scriptConsole()).toEqual([
+            { type: 'out', value: 'a' },
+        ]);
+        expect(simulation.simulationConsole()).toEqual([
+            { type: 'out', value: 'b'}
+        ]);
+
     });
 });
 

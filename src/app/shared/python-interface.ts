@@ -1,14 +1,19 @@
 /** Provides type definitions for the page-worker interface */
 
 /** Message from the page to the worker */
-export interface PageMessage {
+export type PageMessage = {
     /** id of the simulation */
     id: number;
     /** python script */
     script: string;
-
     type: 'start'
-}
+} | {
+    id: number;
+    type: 'step'
+} | {
+    id: number;
+    type: 'run';
+};
 
 export type WorkerMessageStatus =
     'loading' | 'starting' | 'complete'  | 'error' | 'stdout' | 'stderr';
