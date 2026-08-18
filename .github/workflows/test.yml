@@ -34,4 +34,5 @@ jobs:
     - name: Run all tests
       run: |
         chromedriver --version
+        yarn prebuild
         yarn ng test --no-watch --no-progress --browsers=ChromeHeadless
