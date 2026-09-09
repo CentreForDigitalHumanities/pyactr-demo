@@ -24,7 +24,7 @@ export class Simulation {
     id = nextID++;
 
     scriptConsole = signal<ConsoleEvent[]>([]);
-    simulationConsole = signal<ConsoleEvent[]>([]);
+    stepperConsole = signal<ConsoleEvent[]>([]);
     status$ = new BehaviorSubject<SimulationStatus>('idle');
 
     private interrupt$ = new Subject<void>();

@@ -91,7 +91,7 @@ describe('Simulation', () => {
         expect(simulation.scriptConsole()).toEqual([
             { type: 'out', value: 'a' },
         ]);
-        expect(simulation.simulationConsole()).toEqual([
+        expect(simulation.stepperConsole()).toEqual([
             { type: 'out', value: 'b'}
         ]);
 
