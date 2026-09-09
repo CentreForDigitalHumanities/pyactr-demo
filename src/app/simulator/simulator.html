@@ -46,6 +46,7 @@
                                     class="btn btn-danger"
                                     type="button"
                                     title="Stop simulation"
+                                    [disabled]="(simulationStatus$ | async)?.status !== 'running'"
                                     (click)="stop()">
                                     Stop
                                 </button>
