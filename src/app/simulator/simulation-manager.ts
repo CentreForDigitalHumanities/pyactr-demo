@@ -87,7 +87,11 @@ export class Simulation {
 
     private onWorkerMessage(data: WorkerMessage) {
         if (data.status === 'starting') {
-            this.status$.next({ stage: 'script', status: 'running' });
+            if (this.status$.value.stage !== 'stepper') {
+                this.status$.next({ stage: 'script', status: 'running' });
+            } else {
+                this.status$.next({ stage: 'stepper', status: 'running' });
+            }
         }
         if (data.status === 'stdout') {
             this.currentConsole().update((value) =>
@@ -109,6 +113,8 @@ export class Simulation {
                     this.status$.next({ stage: 'script', status: 'complete' });
                     this.status$.complete();
                 }
+            } else if (this.status$.value.stage == 'stepper') {
+                this.status$.next({ stage: 'stepper', status: 'idle' });
             }
         }
         if (data.status === 'error') {

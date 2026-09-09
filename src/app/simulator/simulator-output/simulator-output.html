@@ -1,4 +1,3 @@
-
 <div class="card">
     <div class="card-header">
         <h2 class="fs-4 mb-0">Output</h2>
@@ -10,19 +9,25 @@
                 <span role="status" >
                     @if (status?.stage === 'loading') {
                         @switch (status?.status) {
+                            @case ('idle') {
+                                Waiting to start simulation...
+                            }
                             @case ('running') {
                                 <div class="spinner-border spinner-border-sm" aria-hidden="true"></div>
-                                Loading pyactr...
-                            } @case ('error') {
-                                Error while loading pyactr!
-                            } @case ('interrupt') {
+                                Loading PyACT-R...
+                            }
+                            @case ('interrupt') {
                                 Loading interrupted!
-                            } @case ('idle') {
-                                Waiting to start simulation...
+                            }
+                            @case ('error') {
+                                Error while loading PyACT-R!
+                            }
+                            @case ('complete') {
+                                Loaded PyACT-R (no script to run).
                             }
                         }
                     } @else {
-                        Loaded pyactr
+                        Loaded PyACT-R
                     }
                 </span>
             </div>
@@ -32,19 +37,25 @@
                     <p role="status">
                         @if (status?.stage === 'script') {
                             @switch (status?.status) {
+                                @case ('idle') {
+                                    Waiting...
+                                }
                                 @case ('running') {
                                     <div class="spinner-border spinner-border-sm" aria-hidden="true"></div>
                                     Running script...
-                                } @case ('complete') {
-                                    Script complete (no PyACT-R model provided)
-                                } @case ('error') {
-                                    There was an error while running the script
-                                } @case ('interrupt') {
-                                    Script interrupted
+                                }
+                                @case ('complete') {
+                                    Script completed (no PyACT-R model returned)
+                                }
+                                @case ('error') {
+                                    There was an error while running the script!
+                                }
+                                @case ('interrupt') {
+                                    Script interrupted!
                                 }
                             }
                         } @else {
-                            Script complete (PyACT-R model provided)
+                            Script complete (and returned a PyACT-R model)
                         }
                     </p>
 
@@ -56,6 +67,26 @@
             @if (status?.stage === 'stepper') {
                 <div class="list-group-item">
                     <h3 class="fs-5">Simulation</h3>
+                    <p role="status">
+                        @switch (status?.status) {
+                            @case ('idle') {
+                                Use the controls below to step through the simulation.
+                            }
+                            @case ('running') {
+                                <div class="spinner-border spinner-border-sm" aria-hidden="true"></div>
+                                Running simulation...
+                            }
+                            @case ('interrupt') {
+                                Simulation interrupted!
+                            }
+                            @case ('error') {
+                                There was an error while running the simulation!
+                            }
+                            @case ('complete') {
+                                Simulation complete.
+                            }
+                        }
+                    </p>
                     <div class="my-3">
                         <app-stepper [simulation]="simulation" />
                     </div>

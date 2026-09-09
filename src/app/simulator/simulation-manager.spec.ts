@@ -93,6 +93,10 @@ describe('Simulation', () => {
         });
         python.workerMessage$.next({
             id: simulation.id,
+            status: 'starting',
+        });
+        python.workerMessage$.next({
+            id: simulation.id,
             status: 'stdout',
             value: 'b'
         });
@@ -102,7 +106,6 @@ describe('Simulation', () => {
         expect(simulation.stepperConsole()).toEqual([
             { type: 'out', value: 'b'}
         ]);
-
     });
 
     describe('error states', () => {
@@ -140,6 +143,10 @@ describe('Simulation', () => {
                 id: simulation.id,
                 status: 'complete',
                 value: true,
+            });
+            python.workerMessage$.next({
+                id: simulation.id,
+                status: 'starting',
             });
             python.workerMessage$.next({
                 id: simulation.id,
@@ -184,6 +191,10 @@ describe('Simulation', () => {
                 id: simulation.id,
                 status: 'complete',
                 value: true,
+            });
+            python.workerMessage$.next({
+                id: simulation.id,
+                status: 'starting',
             });
             simulation.stop();
             expect(simulation.status$.value).toEqual({ stage: 'stepper', status: 'interrupt'});
