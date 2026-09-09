@@ -5,5 +5,7 @@ export class PythonMock {
     workerMessage$ = new Subject<any>();
 
     postMessage() {}
+
+    stop() {}
 }
 

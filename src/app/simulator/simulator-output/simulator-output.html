@@ -8,22 +8,26 @@
         <div class="list-group list-group-flush">
             <div class="list-group-item">
                 <span role="status" >
-                    @if (status == 'loading') {
+                    @if (status === 'loading') {
                         <div class="spinner-border spinner-border-sm" aria-hidden="true"></div>
                         Loading pyactr...
+                    } @else if (status === 'loading_error') {
+                        Error while loading pyactr!
+                    } @else if (status === 'loading_interrupt') {
+                        Loading interrupted!
                     } @else {
                         Loaded pyactr
                     }
                 </span>
             </div>
-            @if (status !== 'idle' && status !== 'loading') {
+            @if (status !== 'idle' && !status?.startsWith('loading')) {
                 <div class="list-group-item">
                     <h3 class="fs-5">Script</h3>
                     <p role="status">
-                        @if (status === 'running') {
+                        @if (status === 'script_running') {
                             <div class="spinner-border spinner-border-sm" aria-hidden="true"></div>
                             Running script...
-                        } @else if (status === 'complete' || status == 'stepper') {
+                        } @else if (status === 'script_complete' || status?.startsWith('stepper')) {
                             Script complete
                         } @else if (status === 'script_error') {
                             There was an error while running the script
@@ -37,7 +41,7 @@
                     </div>
                 </div>
             }
-            @if (status == 'stepper') {
+            @if (status?.startsWith('stepper')) {
                 <div class="list-group-item">
                     <h3 class="fs-5">Simulation</h3>
                     <div class="my-3">

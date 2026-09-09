@@ -8,17 +8,34 @@ let nextID = 0;
 export type SimulationStatus =
     'idle' // not started yet
     | 'loading' // loading pyodide/pyactr
-    | 'running' // user script running
-    | 'stepper' // user script complete; show stepper
-    | 'complete' // user script complete; no stepper
+    | 'loading_interrupt' // interrupted pyactr loading
+    | 'loading_error' // error while loading pyactr
+    | 'script_running' // user script running
     | 'script_interrupt' // user script interrupted
     | 'script_error' // user script error
+    | 'script_complete' // user script complete; no stepper
+    | 'stepper_idle' // user script complete; show stepper
+    | 'stepper_running' // executing stepper code
+    | 'stepper_interrupt' // interrupted stepper code
+    | 'stepper_error' // error in stepper code
 ;
 
 export interface ConsoleEvent {
     type: 'out' | 'err';
     value: string;
 }
+
+export const isFinished = (status: SimulationStatus) =>
+    [
+        'loading_interrupt',
+        'loading_error',
+        'script_interrupt',
+        'script_error',
+        'script_complete',
+        'stepper_interrupt',
+        'stepper_error'
+    ].includes(status)
+
 
 export class Simulation {
     id = nextID++;
@@ -40,7 +57,7 @@ export class Simulation {
         this.status$.next('loading');
         const stopListening$ = merge(
             this.interrupt$,
-            this.status$.pipe(filter(value => value == 'complete' || value == 'script_error' || value == 'script_interrupt')),
+            this.status$.pipe(filter(isFinished)),
         );
         this.python.workerMessage$.pipe(
             takeUntil(stopListening$),
@@ -56,7 +73,14 @@ export class Simulation {
     stop() {
         if (!this.interrupt$.closed) {
             this.python.stop();
-            this.status$.next('script_interrupt');
+            const status = this.status$.value;
+            if (status.startsWith('loading')) {
+                this.status$.next('loading_interrupt');
+            } else if (status.startsWith('script')) {
+                this.status$.next('script_interrupt');
+            } else if (status.startsWith('stepper')) {
+                this.status$.next('stepper_interrupt');
+            }
             this.interrupt$.next();
             this.interrupt$.complete();
             this.status$.complete();
@@ -72,37 +96,47 @@ export class Simulation {
     }
 
     private onWorkerMessage(data: WorkerMessage) {
-        if (data.status == 'starting') {
-            this.status$.next('running');
+        if (data.status === 'starting') {
+            this.status$.next('script_running');
         }
-        if (data.status == 'stdout') {
+        if (data.status === 'stdout') {
             this.currentConsole().update((value) =>
                 [...value, { type: 'out', value: data.value }]
             );
         }
-        if (data.status == 'stderr') {
+        if (data.status === 'stderr') {
             this.currentConsole().update((value) =>
                 [...value, { type: 'err', value: data.value }]
             );
         }
-        if (data.status == 'complete') {
+        if (data.status === 'complete') {
             this.interrupt$.complete();
             if (data.value) {
-                this.status$.next('stepper');
-                this.currentConsole.set(this.simulationConsole);
+                this.status$.next('stepper_idle');
+                this.currentConsole.set(this.stepperConsole);
             } else {
-                this.status$.next('complete');
+                this.status$.next('script_complete');
                 this.status$.complete();
             }
         }
-        if (data.status == 'error') {
+        if (data.status === 'error') {
+            // set console message
             const err = data.value as Error;
             this.currentConsole().update((value) =>
                 [...value, { type: 'err' , value: err.message }]
             );
-            if (this.status$.value !== 'stepper') {
+            // update simulation status
+            const status = this.status$.value;
+            if (status.startsWith('loading')) {
+                this.status$.next('loading_error');
+            } else if (status.startsWith('script')) {
                 this.status$.next('script_error');
-                this.status$.complete();
+            } else if (status.startsWith('stepper')) {
+                this.status$.next('stepper_error');
+            }
+            this.status$.complete();
+            // close interrupt observable
+            if (!this.interrupt$.closed) {
                 this.interrupt$.complete();
             }
         }

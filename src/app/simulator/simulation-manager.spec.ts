@@ -96,6 +96,91 @@ describe('Simulation', () => {
         ]);
 
     });
+
+    describe('error states', () => {
+        it('sets loading_error', () => {
+            simulation.start();
+            python.workerMessage$.next({
+                id: simulation.id,
+                status: 'error',
+                value: { message: 'test' }
+            });
+            expect(simulation.status$.value).toBe('loading_error');
+        });
+
+        it('sets script_error', () => {
+            simulation.start();
+            python.workerMessage$.next({
+                id: simulation.id,
+                status: 'starting',
+            });
+            python.workerMessage$.next({
+                id: simulation.id,
+                status: 'error',
+                value: { message: 'test' }
+            });
+            expect(simulation.status$.value).toBe('script_error');
+        });
+
+        it('sets stepper_error', () => {
+            simulation.start();
+            python.workerMessage$.next({
+                id: simulation.id,
+                status: 'starting',
+            });
+            python.workerMessage$.next({
+                id: simulation.id,
+                status: 'complete',
+                value: true,
+            });
+            python.workerMessage$.next({
+                id: simulation.id,
+                status: 'error',
+                value: { message: 'test' }
+            });
+            expect(simulation.status$.value).toBe('stepper_error');
+        });
+    });
+
+    describe('stop', () => {
+        it('calls Python.stop', () => {
+            const spy = spyOn(python, 'stop');
+            simulation.start();
+            simulation.stop();
+            expect(spy).toHaveBeenCalled();
+        });
+
+        it('sets status loading_interrupt', () => {
+            simulation.start();
+            simulation.stop();
+            expect(simulation.status$.value).toBe('loading_interrupt');
+        });
+
+        it('sets status script_interrupt', () => {
+            simulation.start();
+            python.workerMessage$.next({
+                id: simulation.id,
+                status: 'starting',
+            });
+            simulation.stop();
+            expect(simulation.status$.value).toBe('script_interrupt');
+        });
+
+        it('sets status stepper_interrupt', () => {
+            simulation.start();
+            python.workerMessage$.next({
+                id: simulation.id,
+                status: 'starting',
+            });
+            python.workerMessage$.next({
+                id: simulation.id,
+                status: 'complete',
+                value: true,
+            });
+            simulation.stop();
+            expect(simulation.status$.value).toBe('stepper_interrupt');
+        });
+    });
 });
 
 describe('SimulationManager', () => {
