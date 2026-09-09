@@ -8,31 +8,43 @@
         <div class="list-group list-group-flush">
             <div class="list-group-item">
                 <span role="status" >
-                    @if (status === 'loading') {
-                        <div class="spinner-border spinner-border-sm" aria-hidden="true"></div>
-                        Loading pyactr...
-                    } @else if (status === 'loading_error') {
-                        Error while loading pyactr!
-                    } @else if (status === 'loading_interrupt') {
-                        Loading interrupted!
+                    @if (status?.stage === 'loading') {
+                        @switch (status?.status) {
+                            @case ('running') {
+                                <div class="spinner-border spinner-border-sm" aria-hidden="true"></div>
+                                Loading pyactr...
+                            } @case ('error') {
+                                Error while loading pyactr!
+                            } @case ('interrupt') {
+                                Loading interrupted!
+                            } @case ('idle') {
+                                Waiting to start simulation...
+                            }
+                        }
                     } @else {
                         Loaded pyactr
                     }
                 </span>
             </div>
-            @if (status !== 'idle' && !status?.startsWith('loading')) {
+            @if (status?.stage === 'script' || status?.stage === 'stepper') {
                 <div class="list-group-item">
                     <h3 class="fs-5">Script</h3>
                     <p role="status">
-                        @if (status === 'script_running') {
-                            <div class="spinner-border spinner-border-sm" aria-hidden="true"></div>
-                            Running script...
-                        } @else if (status === 'script_complete' || status?.startsWith('stepper')) {
-                            Script complete
-                        } @else if (status === 'script_error') {
-                            There was an error while running the script
-                        } @else if (status == 'script_interrupt') {
-                            Script interrupted
+                        @if (status?.stage === 'script') {
+                            @switch (status?.status) {
+                                @case ('running') {
+                                    <div class="spinner-border spinner-border-sm" aria-hidden="true"></div>
+                                    Running script...
+                                } @case ('complete') {
+                                    Script complete (no PyACT-R model provided)
+                                } @case ('error') {
+                                    There was an error while running the script
+                                } @case ('interrupt') {
+                                    Script interrupted
+                                }
+                            }
+                        } @else {
+                            Script complete (PyACT-R model provided)
                         }
                     </p>
 
@@ -41,7 +53,7 @@
                     </div>
                 </div>
             }
-            @if (status?.startsWith('stepper')) {
+            @if (status?.stage === 'stepper') {
                 <div class="list-group-item">
                     <h3 class="fs-5">Simulation</h3>
                     <div class="my-3">

@@ -50,6 +50,10 @@ describe('Simulation', () => {
         simulation.start();
         python.workerMessage$.next({
             id: simulation.id,
+            status: 'starting',
+        });
+        python.workerMessage$.next({
+            id: simulation.id,
             status: 'stdout',
             value: 'a'
         });
@@ -73,6 +77,10 @@ describe('Simulation', () => {
 
     it('splits script output and simulation output', () => {
         simulation.start();
+        python.workerMessage$.next({
+            id: simulation.id,
+            status: 'starting',
+        });
         python.workerMessage$.next({
             id: simulation.id,
             status: 'stdout',
@@ -105,7 +113,7 @@ describe('Simulation', () => {
                 status: 'error',
                 value: { message: 'test' }
             });
-            expect(simulation.status$.value).toBe('loading_error');
+            expect(simulation.status$.value).toEqual({ stage: 'loading', status: 'error'});
         });
 
         it('sets script_error', () => {
@@ -119,7 +127,7 @@ describe('Simulation', () => {
                 status: 'error',
                 value: { message: 'test' }
             });
-            expect(simulation.status$.value).toBe('script_error');
+            expect(simulation.status$.value).toEqual({ stage: 'script', status: 'error'});
         });
 
         it('sets stepper_error', () => {
@@ -138,7 +146,7 @@ describe('Simulation', () => {
                 status: 'error',
                 value: { message: 'test' }
             });
-            expect(simulation.status$.value).toBe('stepper_error');
+            expect(simulation.status$.value).toEqual({ stage: 'stepper', status: 'error'});
         });
     });
 
@@ -153,7 +161,7 @@ describe('Simulation', () => {
         it('sets status loading_interrupt', () => {
             simulation.start();
             simulation.stop();
-            expect(simulation.status$.value).toBe('loading_interrupt');
+            expect(simulation.status$.value).toEqual({ stage: 'loading', status: 'interrupt'});
         });
 
         it('sets status script_interrupt', () => {
@@ -163,7 +171,7 @@ describe('Simulation', () => {
                 status: 'starting',
             });
             simulation.stop();
-            expect(simulation.status$.value).toBe('script_interrupt');
+            expect(simulation.status$.value).toEqual({ stage: 'script', status: 'interrupt'});
         });
 
         it('sets status stepper_interrupt', () => {
@@ -178,7 +186,7 @@ describe('Simulation', () => {
                 value: true,
             });
             simulation.stop();
-            expect(simulation.status$.value).toBe('stepper_interrupt');
+            expect(simulation.status$.value).toEqual({ stage: 'stepper', status: 'interrupt'});
         });
     });
 });
