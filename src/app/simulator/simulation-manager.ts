@@ -123,7 +123,7 @@ export class SimulationManager {
         simulation.start();
     }
 
-    runStop(){
+    stop(){
         this.current$.value?.stop();
     }
 }

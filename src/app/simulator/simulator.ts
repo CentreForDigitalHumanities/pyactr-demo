@@ -82,14 +82,13 @@ export class Simulator {
         URL.revokeObjectURL(url);
     }
 
-    onSubmit(id: 'run' | 'stop') {
-        if(id === "run"){
-            const code = this.form.controls.code.value || '';
-            this.simulationManager.run(code);
-        }
-        else if(id === "stop"){
-            this.simulationManager.runStop();
-        }
+    submit() {
+        const code = this.form.controls.code.value || '';
+        this.simulationManager.run(code);
+    }
+
+    stop() {
+        this.simulationManager.stop();
     }
 
     example:string | null;
