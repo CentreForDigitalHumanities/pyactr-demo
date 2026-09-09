@@ -50,6 +50,10 @@ describe('Simulation', () => {
         simulation.start();
         python.workerMessage$.next({
             id: simulation.id,
+            status: 'starting',
+        });
+        python.workerMessage$.next({
+            id: simulation.id,
             status: 'stdout',
             value: 'a'
         });
@@ -75,6 +79,10 @@ describe('Simulation', () => {
         simulation.start();
         python.workerMessage$.next({
             id: simulation.id,
+            status: 'starting',
+        });
+        python.workerMessage$.next({
+            id: simulation.id,
             status: 'stdout',
             value: 'a'
         });
@@ -85,16 +93,112 @@ describe('Simulation', () => {
         });
         python.workerMessage$.next({
             id: simulation.id,
+            status: 'starting',
+        });
+        python.workerMessage$.next({
+            id: simulation.id,
             status: 'stdout',
             value: 'b'
         });
         expect(simulation.scriptConsole()).toEqual([
             { type: 'out', value: 'a' },
         ]);
-        expect(simulation.simulationConsole()).toEqual([
+        expect(simulation.stepperConsole()).toEqual([
             { type: 'out', value: 'b'}
         ]);
+    });
 
+    describe('error states', () => {
+        it('sets loading_error', () => {
+            simulation.start();
+            python.workerMessage$.next({
+                id: simulation.id,
+                status: 'error',
+                value: { message: 'test' }
+            });
+            expect(simulation.status$.value).toEqual({ stage: 'loading', status: 'error'});
+        });
+
+        it('sets script_error', () => {
+            simulation.start();
+            python.workerMessage$.next({
+                id: simulation.id,
+                status: 'starting',
+            });
+            python.workerMessage$.next({
+                id: simulation.id,
+                status: 'error',
+                value: { message: 'test' }
+            });
+            expect(simulation.status$.value).toEqual({ stage: 'script', status: 'error'});
+        });
+
+        it('sets stepper_error', () => {
+            simulation.start();
+            python.workerMessage$.next({
+                id: simulation.id,
+                status: 'starting',
+            });
+            python.workerMessage$.next({
+                id: simulation.id,
+                status: 'complete',
+                value: true,
+            });
+            python.workerMessage$.next({
+                id: simulation.id,
+                status: 'starting',
+            });
+            python.workerMessage$.next({
+                id: simulation.id,
+                status: 'error',
+                value: { message: 'test' }
+            });
+            expect(simulation.status$.value).toEqual({ stage: 'stepper', status: 'error'});
+        });
+    });
+
+    describe('stop', () => {
+        it('calls Python.stop', () => {
+            const spy = spyOn(python, 'stop');
+            simulation.start();
+            simulation.stop();
+            expect(spy).toHaveBeenCalled();
+        });
+
+        it('sets status loading_interrupt', () => {
+            simulation.start();
+            simulation.stop();
+            expect(simulation.status$.value).toEqual({ stage: 'loading', status: 'interrupt'});
+        });
+
+        it('sets status script_interrupt', () => {
+            simulation.start();
+            python.workerMessage$.next({
+                id: simulation.id,
+                status: 'starting',
+            });
+            simulation.stop();
+            expect(simulation.status$.value).toEqual({ stage: 'script', status: 'interrupt'});
+        });
+
+        it('sets status stepper_interrupt', () => {
+            simulation.start();
+            python.workerMessage$.next({
+                id: simulation.id,
+                status: 'starting',
+            });
+            python.workerMessage$.next({
+                id: simulation.id,
+                status: 'complete',
+                value: true,
+            });
+            python.workerMessage$.next({
+                id: simulation.id,
+                status: 'starting',
+            });
+            simulation.stop();
+            expect(simulation.status$.value).toEqual({ stage: 'stepper', status: 'interrupt'});
+        });
     });
 });
 

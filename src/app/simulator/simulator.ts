@@ -8,6 +8,7 @@ import { HttpClient } from '@angular/common/http';
 import { CodeEditor, Theme } from '@acrodata/code-editor';
 import { languages } from '@codemirror/language-data';
 import { SimulatorOutput } from "./simulator-output/simulator-output";
+import { map, of, switchMap } from 'rxjs';
 
 
 @Component({
@@ -41,6 +42,10 @@ export class Simulator {
 
     theme = signal<Theme>("light");
     indentWithTab = signal<boolean>(true);
+
+    simulationStatus$ = this.simulationManager.current$.pipe(
+        switchMap(simulation => simulation ? simulation.status$ : of(null))
+    );
 
     onCheckedDarkTheme(event: Event){
         const checkedTheme = (event.target as HTMLInputElement).checked;
@@ -82,14 +87,13 @@ export class Simulator {
         URL.revokeObjectURL(url);
     }
 
-    onSubmit(id: 'run' | 'stop') {
-        if(id === "run"){
-            const code = this.form.controls.code.value || '';
-            this.simulationManager.run(code);
-        }
-        else if(id === "stop"){
-            this.simulationManager.runStop();
-        }
+    submit() {
+        const code = this.form.controls.code.value || '';
+        this.simulationManager.run(code);
+    }
+
+    stop() {
+        this.simulationManager.stop();
     }
 
     example:string | null;

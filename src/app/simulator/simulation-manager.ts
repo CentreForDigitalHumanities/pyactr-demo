@@ -5,27 +5,40 @@ import { WorkerMessage } from '../shared/python-interface';
 
 let nextID = 0;
 
-export type SimulationStatus =
-    'idle' // not started yet
-    | 'loading' // loading pyodide/pyactr
-    | 'running' // user script running
-    | 'stepper' // user script complete; show stepper
-    | 'complete' // user script complete; no stepper
-    | 'script_interrupt' // user script interrupted
-    | 'script_error' // user script error
+export type SimulationStage =
+    | 'loading' // loading pyactr
+    | 'script' // user script
+    | 'stepper'; // interactive stepper
 ;
+
+export type StageStatus =
+    'idle' // waiting for input
+    | 'running' // running Python code
+    | 'error' // Python exited with error
+    | 'interrupt' // user interrupted code execution
+    | 'complete' // code running complete
+;
+
+export interface SimulationStatus {
+    stage: SimulationStage,
+    status: StageStatus,
+}
 
 export interface ConsoleEvent {
     type: 'out' | 'err';
     value: string;
 }
 
+export const isFinished = (status: SimulationStatus) =>
+    ['interrupt', 'error', 'complete'].includes(status.status);
+
+
 export class Simulation {
     id = nextID++;
 
     scriptConsole = signal<ConsoleEvent[]>([]);
-    simulationConsole = signal<ConsoleEvent[]>([]);
-    status$ = new BehaviorSubject<SimulationStatus>('idle');
+    stepperConsole = signal<ConsoleEvent[]>([]);
+    status$ = new BehaviorSubject<SimulationStatus>({ stage: 'loading', status: 'idle' });
 
     private interrupt$ = new Subject<void>();
     private currentConsole = signal<WritableSignal<ConsoleEvent[]>>(this.scriptConsole);
@@ -37,10 +50,10 @@ export class Simulation {
 
     /** Run simulation code */
     start() {
-        this.status$.next('loading');
+        this.status$.next({ stage: 'loading', status: 'running' });
         const stopListening$ = merge(
             this.interrupt$,
-            this.status$.pipe(filter(value => value == 'complete' || value == 'script_error' || value == 'script_interrupt')),
+            this.status$.pipe(filter(isFinished))
         );
         this.python.workerMessage$.pipe(
             takeUntil(stopListening$),
@@ -56,10 +69,11 @@ export class Simulation {
     stop() {
         if (!this.interrupt$.closed) {
             this.python.stop();
-            this.status$.next('script_interrupt');
+            const currentStage = this.status$.value.stage;
+            this.status$.next({ stage: currentStage, status: 'interrupt'});
+            this.status$.complete();
             this.interrupt$.next();
             this.interrupt$.complete();
-            this.status$.complete();
         }
     }
 
@@ -72,37 +86,49 @@ export class Simulation {
     }
 
     private onWorkerMessage(data: WorkerMessage) {
-        if (data.status == 'starting') {
-            this.status$.next('running');
+        if (data.status === 'starting') {
+            if (this.status$.value.stage !== 'stepper') {
+                this.status$.next({ stage: 'script', status: 'running' });
+            } else {
+                this.status$.next({ stage: 'stepper', status: 'running' });
+            }
         }
-        if (data.status == 'stdout') {
+        if (data.status === 'stdout') {
             this.currentConsole().update((value) =>
                 [...value, { type: 'out', value: data.value }]
             );
         }
-        if (data.status == 'stderr') {
+        if (data.status === 'stderr') {
             this.currentConsole().update((value) =>
                 [...value, { type: 'err', value: data.value }]
             );
         }
-        if (data.status == 'complete') {
+        if (data.status === 'complete') {
             this.interrupt$.complete();
-            if (data.value) {
-                this.status$.next('stepper');
-                this.currentConsole.set(this.simulationConsole);
-            } else {
-                this.status$.next('complete');
-                this.status$.complete();
+            if (this.status$.value.stage == 'script') {
+                if (data.value) {
+                    this.status$.next({ stage: 'stepper', status: 'idle' });
+                    this.currentConsole.set(this.stepperConsole);
+                } else {
+                    this.status$.next({ stage: 'script', status: 'complete' });
+                    this.status$.complete();
+                }
+            } else if (this.status$.value.stage == 'stepper') {
+                this.status$.next({ stage: 'stepper', status: 'idle' });
             }
         }
-        if (data.status == 'error') {
+        if (data.status === 'error') {
+            // set console message
             const err = data.value as Error;
             this.currentConsole().update((value) =>
                 [...value, { type: 'err' , value: err.message }]
             );
-            if (this.status$.value !== 'stepper') {
-                this.status$.next('script_error');
-                this.status$.complete();
+            // update simulation status
+            const currentStage = this.status$.value.stage;
+            this.status$.next({ stage: currentStage, status: 'error' });
+            this.status$.complete();
+            // close interrupt observable
+            if (!this.interrupt$.closed) {
                 this.interrupt$.complete();
             }
         }
@@ -123,7 +149,7 @@ export class SimulationManager {
         simulation.start();
     }
 
-    runStop(){
+    stop(){
         this.current$.value?.stop();
     }
 }

@@ -39,14 +39,15 @@
                                     class="btn btn-success"
                                     type="submit"
                                     title="Run simulation"
-                                    (click)="onSubmit('run')">
+                                    (click)="submit()">
                                     Run
                                 </button>
                                 <button
                                     class="btn btn-danger"
-                                    type="submit"
+                                    type="button"
                                     title="Stop simulation"
-                                    (click)="onSubmit('stop')">
+                                    [disabled]="(simulationStatus$ | async)?.status !== 'running'"
+                                    (click)="stop()">
                                     Stop
                                 </button>
                             </div>
