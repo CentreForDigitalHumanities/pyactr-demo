@@ -1,8 +1,13 @@
+@let sim = simulation();
+@let disable = disable$() | async;
+
 <div class="hstack">
-    <button class="btn btn-primary me-2" (click)="simulation().step()">
+    <button class="btn btn-primary me-2" (click)="sim.step()"
+        [disabled]="disable">
         Step
     </button>
-    <button class="btn btn-primary" (click)="simulation().run()">
+    <button class="btn btn-primary" (click)="sim.run()"
+        [disabled]="disable">
         Run all
     </button>
 </div>
