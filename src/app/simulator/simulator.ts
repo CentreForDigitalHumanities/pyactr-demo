@@ -68,24 +68,69 @@ export class Simulator {
     }
 
 
-    copyToClipboard() {
-        navigator.clipboard.writeText(this.form.controls.code.value ?? '');
+    /** Copy text function **/
+
+    copyMessage = '';
+    private copyMessageTimeout?: ReturnType<typeof setTimeout>;
+
+    async copyToClipboard(): Promise<void> {
+        try {
+            const text = this.form.controls.code.value ?? '';
+            if (text === ''){
+                this.copyMessage = "No text to copy!";
+            }
+            else {
+                await navigator.clipboard.writeText(text);
+                this.copyMessage = "Copied!";
+            }
+        }
+        catch (error) {
+            this.copyMessage = "Copy failed";
+            console.error("Could not copy text", error);
+        }
+        if (this.copyMessageTimeout) {
+            clearTimeout(this.copyMessageTimeout);
+        }
+        this.copyMessageTimeout = setTimeout(() => {
+            this.copyMessage = '';
+        }, 2000);
     }
 
-    downloadAsPythonFile() {
-        const text = this.form.controls.code.value ?? '';
 
-        const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
-        const url = URL.createObjectURL(blob);
+    /** Download text function **/
 
-        // Create an <a> element to trigger the download feature
-        const a = document.createElement('a');
-        a.href = url; // The link refers to the generated URL for the blob
-        a.download = 'code.py';
-        a.click(); // Simulate a user clicking the link
+    downloadMessage = '';
+    private downloadMessageTimeout?: ReturnType<typeof setTimeout>;
 
-        URL.revokeObjectURL(url);
+    downloadAsPythonFile(): void {
+        try {
+            const text = this.form.controls.code.value ?? '';
+            if (text === ''){
+                this.downloadMessage = "No text to download!";
+            }
+            else {
+                const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a'); // Create an <a> element to trigger the download feature
+                a.href = url; // The link refers to the generated URL for the blob
+                a.download = 'code.py';
+                a.click(); // Simulate a user clicking the link
+                setTimeout(() => URL.revokeObjectURL(url), 1000);
+                this.downloadMessage = "Download started";
+            }
+        }
+        catch (error) {
+            this.downloadMessage = 'Download failed';
+            console.error('Could not download file: ', error);
+        }
+        if (this.downloadMessageTimeout){
+            clearTimeout(this.downloadMessageTimeout);
+        }
+        this.downloadMessageTimeout = setTimeout(() => {
+            this.downloadMessage = '';
+        }, 2000);
     }
+
 
     submit() {
         const code = this.form.controls.code.value || '';
