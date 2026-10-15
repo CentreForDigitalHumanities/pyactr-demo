@@ -102,10 +102,18 @@ export class Simulator {
         this.example = this.activatedRoute.snapshot.paramMap.get('example_name');
         if (this.example){
             let exampleScript = getExample(exampleScripts, this.example);
-            if (exampleScript){
-                const url = "examplescripts/" + exampleScript.filename;
-                this.http.get(url, {responseType: "text"}).subscribe((text) =>
-                    this.form.controls.code.setValue(text));
+            try {
+                if (exampleScript){
+                    const url = "examplescripts/" + exampleScript.filename;
+                    this.http.get(url, {responseType: "text"}).subscribe((text) =>
+                        this.form.controls.code.setValue(text));
+                }
+                else {
+                    console.error('The example script does not exist.')
+                }
+            }
+            catch (error) {
+                console.error('Something went wrong when retrieving the example script: ', error)
             }
         }
 
