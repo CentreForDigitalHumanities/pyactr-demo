@@ -9,20 +9,37 @@
                     <div class="list-group-item p-2">
                         <div class="d-flex align-items-center justify-content-between gap-4">
                             <div class="d-flex gap-2">
-                                <button
-                                    class="btn btn-light"
-                                    type="button"
-                                    title="Copy code to clipboard"
-                                    (click)="copyToClipboard()">
-                                    Copy
-                                </button>
-                                <button
-                                    class="btn btn-light"
-                                    type="button"
-                                    title="Save code as a Python file"
-                                    (click)="downloadAsPythonFile()">
-                                    Download
-                                </button>
+                                <div class="position-relative d-inline-block">
+                                    <button
+                                        class="btn btn-light"
+                                        type="button"
+                                        title="Copy code to clipboard"
+                                        (click)="copyToClipboard()">
+                                        Copy
+                                    </button>
+                                    @if (copyMessage) {
+                                        <span 
+                                            class="position-absolute bottom-100 start-50 translate-middle-x badge bg-secondary mb-2">
+                                            {{ copyMessage }}
+                                        </span>
+                                    }
+                                </div>
+                                <div class="position-relative d-inline-block">
+                                    <button
+                                        class="btn btn-light"
+                                        type="button"
+                                        title="Save code as a Python file"
+                                        (click)="downloadAsPythonFile()">
+                                        Download
+                                    </button>
+                                    @if (downloadMessage) {
+                                        <span 
+                                            class="position-absolute bottom-100 start-50 translate-middle-x badge bg-secondary mb-2">
+                                            {{ downloadMessage }}
+                                        </span>
+                                    }
+                                </div>
+                                
                             </div>
                             <div class="d-flex gap-2">
                                 <div class="form-check form-switch">
