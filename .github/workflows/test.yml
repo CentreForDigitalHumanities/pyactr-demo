@@ -35,4 +35,4 @@ jobs:
       run: |
         chromedriver --version
         yarn prebuild
-        yarn ng test --no-watch --no-progress --browsers=ChromeHeadless
+        yarn ng test --no-watch --no-progress
