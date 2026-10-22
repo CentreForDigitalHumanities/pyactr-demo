@@ -1,4 +1,4 @@
-import { Component, input } from '@angular/core';
+import { Component, input, ChangeDetectionStrategy } from '@angular/core';
 import { ConsoleEvent } from '../simulation-manager';
 
 
@@ -7,6 +7,7 @@ import { ConsoleEvent } from '../simulation-manager';
   selector: 'app-output-console',
   imports: [],
   templateUrl: './output-console.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './output-console.scss',
 })
 export class OutputConsole {

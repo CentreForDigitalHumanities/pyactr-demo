@@ -1,4 +1,4 @@
-import { Component, input } from '@angular/core';
+import { Component, input, ChangeDetectionStrategy } from '@angular/core';
 import { Simulation } from '../simulation-manager';
 import { CommonModule } from '@angular/common';
 import { OutputConsole } from '../output-console/output-console';
@@ -8,6 +8,7 @@ import { Stepper } from '../stepper/stepper';
     selector: 'app-simulator-output',
     imports: [CommonModule, OutputConsole, Stepper],
     templateUrl: './simulator-output.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './simulator-output.scss',
 })
 export class SimulatorOutput {
