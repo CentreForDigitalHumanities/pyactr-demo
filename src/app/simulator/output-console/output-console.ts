@@ -1,12 +1,13 @@
-import { Component, input } from '@angular/core';
+import { Component, input, ChangeDetectionStrategy } from '@angular/core';
 import { ConsoleEvent } from '../simulation-manager';
-import { CommonModule } from '@angular/common';
+
 
 
 @Component({
   selector: 'app-output-console',
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './output-console.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './output-console.scss',
 })
 export class OutputConsole {

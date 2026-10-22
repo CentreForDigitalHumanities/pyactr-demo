@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { SimulationManager } from './simulation-manager';
 import { CommonModule } from '@angular/common';
@@ -24,6 +24,7 @@ import { map, of, switchMap } from 'rxjs';
         SimulationManager
     ],
     templateUrl: './simulator.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './simulator.scss',
 })
 

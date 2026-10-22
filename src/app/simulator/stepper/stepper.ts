@@ -1,4 +1,4 @@
-import { Component, computed, input } from '@angular/core';
+import { Component, computed, input, ChangeDetectionStrategy } from '@angular/core';
 import { Simulation } from '../simulation-manager';
 import { map } from 'rxjs';
 import { CommonModule } from '@angular/common';
@@ -7,6 +7,7 @@ import { CommonModule } from '@angular/common';
     selector: 'app-stepper',
     imports: [CommonModule],
     templateUrl: './stepper.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './stepper.scss',
 })
 export class Stepper {

@@ -17,7 +17,7 @@ describe('Simulation', () => {
     });
 
     it('messages the worker on start', () => {
-        const spy = spyOn(python, 'postMessage');
+        const spy = vi.spyOn(python, 'postMessage');
         simulation.start();
         expect(spy).toHaveBeenCalled();
     });
@@ -159,7 +159,7 @@ describe('Simulation', () => {
 
     describe('stop', () => {
         it('calls Python.stop', () => {
-            const spy = spyOn(python, 'stop');
+            const spy = vi.spyOn(python, 'stop');
             simulation.start();
             simulation.stop();
             expect(spy).toHaveBeenCalled();
@@ -219,7 +219,7 @@ describe('SimulationManager', () => {
     });
 
     it('runs simulations', () => {
-        const spy = spyOn(python, 'postMessage');
+        const spy = vi.spyOn(python, 'postMessage');
         service.run(dummyScript);
         expect(spy).toHaveBeenCalled();
     });

@@ -1,12 +1,13 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { NgbCollapse } from '@ng-bootstrap/ng-bootstrap';
-import { CommonModule } from '@angular/common';
+
 
 @Component({
     selector: '[app-navbar]',
-    imports: [CommonModule, RouterLink, RouterLinkActive, NgbCollapse],
+    imports: [RouterLink, RouterLinkActive, NgbCollapse],
     templateUrl: './navbar.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './navbar.scss',
 })
 export class Navbar {

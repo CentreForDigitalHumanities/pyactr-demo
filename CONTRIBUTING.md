@@ -23,7 +23,7 @@ As for the other libraries listed here, keep this list in the back of your mind 
 
 You need to install the following software:
 
-- Node 22 and yarn. See [download instructions for Node](https://nodejs.org/en/download). Select version 22, and select the option "with yarn".
+- Node 24 and yarn. See [download instructions for Node](https://nodejs.org/en/download). Select version 24, and select the option "with yarn".
 - [Git](https://git-scm.com/)
 
 Optional:

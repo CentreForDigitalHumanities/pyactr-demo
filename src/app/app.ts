@@ -1,13 +1,14 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, ChangeDetectionStrategy } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { Footer } from './core/footer/footer';
 import { Header } from './core/header/header';
-import { CommonModule } from '@angular/common';
+
 
 @Component({
     selector: 'app-root',
-    imports: [CommonModule, RouterOutlet, Footer, Header],
+    imports: [RouterOutlet, Footer, Header],
     templateUrl: './app.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './app.scss'
 })
 export class App {

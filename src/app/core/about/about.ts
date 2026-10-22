@@ -1,10 +1,11 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
+
 
 @Component({
     selector: 'app-about',
-    imports: [CommonModule],
+    imports: [],
     templateUrl: './about.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './about.scss',
 })
 export class About {
