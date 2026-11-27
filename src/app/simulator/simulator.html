@@ -13,31 +13,37 @@
                                     <button
                                         class="btn btn-light"
                                         type="button"
-                                        title="Copy code to clipboard"
+                                        placement="bottom"
+                                        ngbTooltip="Copy code to clipboard"
                                         (click)="copyToClipboard()">
                                         Copy
                                     </button>
-                                    @if (copyMessage) {
-                                        <span 
-                                            class="position-absolute bottom-100 start-50 translate-middle-x badge bg-secondary mb-2">
-                                            {{ copyMessage }}
-                                        </span>
-                                    }
+                                    <div role="status">
+                                        @if (copyMessage) {
+                                            <span 
+                                                class="position-absolute bottom-100 start-50 translate-middle-x badge bg-secondary mb-2 fs-7 px-3 py-2">
+                                                {{ copyMessage }}
+                                            </span>
+                                        }
+                                    </div>
                                 </div>
                                 <div class="position-relative d-inline-block">
                                     <button
                                         class="btn btn-light"
                                         type="button"
-                                        title="Save code as a Python file"
+                                        placement="bottom"
+                                        ngbTooltip="Save code as a Python file"
                                         (click)="downloadAsPythonFile()">
                                         Download
                                     </button>
-                                    @if (downloadMessage) {
-                                        <span 
-                                            class="position-absolute bottom-100 start-50 translate-middle-x badge bg-secondary mb-2">
-                                            {{ downloadMessage }}
-                                        </span>
-                                    }
+                                    <div role="status">
+                                        @if (downloadMessage) {
+                                            <span 
+                                                class="position-absolute bottom-100 start-50 translate-middle-x badge bg-secondary mb-2 fs-7 px-3 py-2">
+                                                {{ downloadMessage }}
+                                            </span>
+                                        }
+                                    </div>
                                 </div>
                                 
                             </div>

@@ -8,18 +8,20 @@ import { HttpClient } from '@angular/common/http';
 import { CodeEditor, Theme } from '@acrodata/code-editor';
 import { languages } from '@codemirror/language-data';
 import { SimulatorOutput } from "./simulator-output/simulator-output";
-import { map, of, switchMap } from 'rxjs';
+import { of, switchMap } from 'rxjs';
+import { NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
 
 
 @Component({
     selector: 'app-simulator',
     imports: [
-        CommonModule,
-        ReactiveFormsModule,
-        FormsModule,
-        CodeEditor,
-        SimulatorOutput
-    ],
+    CommonModule,
+    ReactiveFormsModule,
+    FormsModule,
+    CodeEditor,
+    SimulatorOutput,
+    NgbTooltip
+],
     providers: [
         SimulationManager
     ],
