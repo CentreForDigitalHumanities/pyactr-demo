@@ -85,6 +85,15 @@ export class Simulation {
         this.python.postMessage({ id: this.id, type: 'run' });
     }
 
+    stepMultiple(intervalValue: number, intervalUnit: string) {
+        this.python.postMessage({ 
+            id: this.id, 
+            type: 'stepMultiple',
+            intervalValue: intervalValue,
+            intervalUnit: intervalUnit
+         });
+    }
+
     private onWorkerMessage(data: WorkerMessage) {
         if (data.status === 'starting') {
             if (this.status$.value.stage !== 'stepper') {

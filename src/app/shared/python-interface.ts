@@ -6,13 +6,18 @@ export type PageMessage = {
     id: number;
     /** python script */
     script: string;
-    type: 'start'
+    type: 'start';
 } | {
     id: number;
-    type: 'step'
+    type: 'step';
 } | {
     id: number;
     type: 'run';
+} | {
+    id: number;
+    type: 'stepMultiple';
+    intervalValue: number;
+    intervalUnit: string;
 };
 
 export type WorkerMessageStatus =

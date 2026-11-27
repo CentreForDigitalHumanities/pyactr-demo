@@ -1,13 +1,41 @@
 @let sim = simulation();
 @let disable = disable$() | async;
 
-<div class="hstack">
-    <button class="btn btn-primary me-2" (click)="sim.step()"
-        [disabled]="disable">
-        Step
-    </button>
-    <button class="btn btn-primary" (click)="sim.run()"
-        [disabled]="disable">
-        Run all
-    </button>
+<div class="d-flex align-items-center justify-content-between gap-6">
+    <div class="d-flex gap-2">
+        <button class="btn btn-primary" 
+            (click)="sim.step()"
+            [disabled]="disable">
+            Step
+        </button>
+        <button class="btn btn-primary" 
+            (click)="sim.run()"
+            [disabled]="disable">
+            Run all
+        </button>
+    </div>
+    <div class="d-flex gap-2">
+        <input
+            id="intervalValue"
+            type="number"
+            class="form-control"
+            [value]="intervalValue"
+            [attr.min]="intervalUnit === 'steps' ? '0' : '0.00'"
+            [attr.step]="intervalUnit === 'steps' ? '1' : '0.05'"
+            (input)="onIntervalValueChange($event)"
+        />
+        <select
+            class="form-select"
+            [value]="intervalUnit"
+            (change)="intervalUnit = $any($event.target).value"
+        >
+            <option value="seconds">Seconds</option>
+            <option value="steps">Steps</option>
+        </select>
+        <button class="btn btn-primary" 
+            (click)="sim.stepMultiple(intervalValue, intervalUnit)"
+            [disabled]="disable">
+            Run
+        </button>
+    </div>
 </div>
