@@ -14,6 +14,19 @@ export class Stepper {
     simulation = input.required<Simulation>();
     disable$ = computed(() => this.disableStepper$(this.simulation()));
 
+    intervalValue: number = 1;
+    intervalUnit: string = 'steps'
+
+    onIntervalValueChange(event: Event) {
+        const input = event.target as HTMLInputElement;
+        const value = Number(input.value);
+        if (this.intervalUnit === 'steps') {
+            this.intervalValue = Math.floor(value);
+        } else {
+            this.intervalValue = value;
+        }
+    }
+
     private disableStepper$(simulation: Simulation) {
         return simulation.status$.pipe(
             map(status => ['error', 'interrupt', 'complete'].includes(status.status)),

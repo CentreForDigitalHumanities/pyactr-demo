@@ -119,6 +119,28 @@ class PythonRunner {
         }
     }
 
+    stepMultipleSimulation(intervalValue: number, intervalUnit: string) {
+        if (this.model) {
+            if (!this.simulation) {
+                this.simulation = this.newSimulation(this.model);
+            }
+            try {
+                this.post('starting');
+                if (intervalUnit === 'steps') {
+                    this.simulation.steps(intervalValue);
+                } else {
+                    const targetTime = this.simulation.show_time() + intervalValue;
+                    while (this.simulation.show_time() < targetTime) {
+                        this.simulation.step();
+                    }
+                }
+                this.post('complete');
+            } catch (err) {
+                this.post('error', err);
+            }
+        }
+    }
+
     private newSimulation(model: ACTRModel): ACTRSimulation {
         return model.simulation.callKwargs({gui: false});
     }
@@ -158,5 +180,9 @@ addEventListener('message', async ({ data }: { data: PageMessage}) => {
 
     if (data.type == 'run') {
         runner?.runSimulation();
+    }
+
+    if (data.type == 'stepMultiple') {
+        runner?.stepMultipleSimulation(data.intervalValue, data.intervalUnit);
     }
 });
